@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCreateProject, useFormatBody, getListProjectsQueryKey } from "@workspace/api-client-react";
+import { useCreateProject, useUpdateProject, useFormatBody, getListProjectsQueryKey, getGetProjectQueryKey } from "@workspace/api-client-react";
 import { useUpload } from "@workspace/object-storage-web";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -158,9 +158,24 @@ const FORMAT_LABELS: Record<FileFormat, string> = {
 interface UploadProjectProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** When provided the sheet switches to edit mode and pre-fills all fields */
+  initialData?: {
+    id: number;
+    title: string;
+    description: string;
+    body?: string | null;
+    tags?: string[] | null;
+    techStack?: string[] | null;
+    githubUrl?: string | null;
+    liveUrl?: string | null;
+    imageUrl?: string | null;
+    visibility: "public" | "private" | "draft";
+    featured?: boolean | null;
+  };
 }
 
-export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
+export function UploadProject({ open, onOpenChange, initialData }: UploadProjectProps) {
+  const isEditMode = !!initialData;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
   const [format, setFormat] = useState<FileFormat | null>(null);
@@ -169,8 +184,26 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
   const [parseError, setParseError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
+  // Pre-fill fields from initialData when opening in edit mode
+  useEffect(() => {
+    if (open && initialData) {
+      setFields({
+        title: initialData.title,
+        description: initialData.description,
+        body: initialData.body ?? "",
+        tags: initialData.tags ?? [],
+        techStack: (initialData.techStack ?? []).join(", "),
+        githubUrl: initialData.githubUrl ?? "",
+        liveUrl: initialData.liveUrl ?? "",
+        imageUrl: initialData.imageUrl ?? "",
+        visibility: initialData.visibility,
+        featured: initialData.featured ?? false,
+      });
+    }
+  }, [open, initialData]);
+
   const queryClient = useQueryClient();
-  const { mutate: createProject, isPending } = useCreateProject({
+  const { mutate: createProject, isPending: isCreating } = useCreateProject({
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListProjectsQueryKey() });
@@ -178,6 +211,16 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
       },
     },
   });
+  const { mutate: updateProject, isPending: isUpdating } = useUpdateProject({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListProjectsQueryKey() });
+        if (initialData) queryClient.invalidateQueries({ queryKey: getGetProjectQueryKey(initialData.id) });
+        setSubmitted(true);
+      },
+    },
+  });
+  const isPending = isCreating || isUpdating;
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string>("");
@@ -294,20 +337,23 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
 
   function handleSubmit(visibility: "public" | "draft") {
     if (!fields) return;
-    createProject({
-      data: {
-        title: fields.title,
-        description: fields.description,
-        body: fields.body || undefined,
-        tags: fields.tags,
-        techStack: toArray(fields.techStack),
-        githubUrl: fields.githubUrl || undefined,
-        liveUrl: fields.liveUrl || undefined,
-        imageUrl: fields.imageUrl || undefined,
-        visibility,
-        featured: fields.featured,
-      },
-    });
+    const payload = {
+      title: fields.title,
+      description: fields.description,
+      body: fields.body || undefined,
+      tags: fields.tags,
+      techStack: toArray(fields.techStack),
+      githubUrl: fields.githubUrl || undefined,
+      liveUrl: fields.liveUrl || undefined,
+      imageUrl: fields.imageUrl || undefined,
+      visibility,
+      featured: fields.featured,
+    };
+    if (isEditMode && initialData) {
+      updateProject({ id: initialData.id, data: payload });
+    } else {
+      createProject({ data: { ...payload, title: payload.title, description: payload.description } });
+    }
   }
 
   function handleClose() {
@@ -334,19 +380,22 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto flex flex-col gap-0 p-0">
         <SheetHeader className="px-6 pt-6 pb-4 border-b">
-          <SheetTitle>Upload Project</SheetTitle>
+          <SheetTitle>{isEditMode ? "Edit Project" : "Upload Project"}</SheetTitle>
           <SheetDescription>
-            Upload a <code className="text-xs bg-muted px-1 py-0.5 rounded">.md</code>,{" "}
-            <code className="text-xs bg-muted px-1 py-0.5 rounded">.pdf</code>, or{" "}
-            <code className="text-xs bg-muted px-1 py-0.5 rounded">.docx</code> file.
-            Fields are pre-filled from your document — review and publish.
+            {isEditMode
+              ? "Update the project fields and save your changes."
+              : <>Upload a <code className="text-xs bg-muted px-1 py-0.5 rounded">.md</code>,{" "}
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">.pdf</code>, or{" "}
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">.docx</code> file.
+                Fields are pre-filled from your document — review and publish.</>
+            }
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
 
-          {/* Drop zone */}
-          <div
+          {/* Drop zone — hidden in edit mode */}
+          {!isEditMode && <div
             className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer select-none
               ${fileName && !parseError
                 ? "border-primary/40 bg-primary/5"
@@ -386,7 +435,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
                 <p className="text-xs text-muted-foreground">.md · .pdf · .docx — or click to browse</p>
               </div>
             )}
-          </div>
+          </div>}
 
           {/* Parse error */}
           {parseError && (
@@ -583,12 +632,20 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
           <div className="px-6 py-4 border-t flex items-center justify-between gap-3 bg-background">
             <Button variant="outline" onClick={handleClose}>Cancel</Button>
             <div className="flex items-center gap-2">
-              <Button variant="outline" disabled={!fields.title || isPending} onClick={() => handleSubmit("draft")}>
-                Save as Draft
-              </Button>
-              <Button disabled={!fields.title || isPending} onClick={() => handleSubmit("public")}>
-                {isPending ? "Publishing…" : "Publish"}
-              </Button>
+              {isEditMode ? (
+                <Button disabled={!fields.title || isPending} onClick={() => handleSubmit(fields.visibility === "public" ? "public" : "draft")}>
+                  {isPending ? "Saving…" : "Save changes"}
+                </Button>
+              ) : (
+                <>
+                  <Button variant="outline" disabled={!fields.title || isPending} onClick={() => handleSubmit("draft")}>
+                    Save as Draft
+                  </Button>
+                  <Button disabled={!fields.title || isPending} onClick={() => handleSubmit("public")}>
+                    {isPending ? "Publishing…" : "Publish"}
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}

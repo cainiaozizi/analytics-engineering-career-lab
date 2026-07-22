@@ -1,13 +1,17 @@
+import { useState } from "react";
 import { useGetNote, getGetNoteQueryKey } from "@workspace/api-client-react";
 import { Link, useParams } from "wouter";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Markdown } from "@/components/markdown";
-import { ArrowLeft, Calendar, Hash } from "lucide-react";
+import { EditNote } from "@/components/edit-note";
+import { ArrowLeft, Calendar, Hash, Pencil } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default function NoteDetail() {
   const params = useParams();
   const id = parseInt(params.id || "0", 10);
+  const [editOpen, setEditOpen] = useState(false);
   
   const { data: note, isLoading } = useGetNote(id, {
     query: { enabled: !!id, queryKey: getGetNoteQueryKey(id) }
@@ -39,9 +43,16 @@ export default function NoteDetail() {
 
   return (
     <article className="max-w-2xl space-y-8">
-      <Link href="/notes" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back to Notes
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link href="/notes" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Notes
+        </Link>
+        <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+          <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
+        </Button>
+      </div>
+
+      <EditNote note={note} open={editOpen} onOpenChange={setEditOpen} />
 
       <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
         <header className="p-6 border-b bg-muted/20">

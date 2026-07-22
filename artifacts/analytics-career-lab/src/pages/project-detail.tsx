@@ -1,14 +1,18 @@
+import { useState } from "react";
 import { useGetProject, getGetProjectQueryKey } from "@workspace/api-client-react";
 import { Link, useParams } from "wouter";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Markdown } from "@/components/markdown";
-import { ArrowLeft, Github, ExternalLink, Calendar, Tag } from "lucide-react";
+import { UploadProject } from "@/components/upload-project";
+import { ArrowLeft, Github, ExternalLink, Calendar, Tag, Pencil } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default function ProjectDetail() {
   const params = useParams();
   const id = parseInt(params.id || "0", 10);
+  const [editOpen, setEditOpen] = useState(false);
   
   const { data: project, isLoading } = useGetProject(id, {
     query: { enabled: !!id, queryKey: getGetProjectQueryKey(id) }
@@ -43,9 +47,18 @@ export default function ProjectDetail() {
 
   return (
     <article className="max-w-3xl space-y-10">
-      <Link href="/projects" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back to Projects
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link href="/projects" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Projects
+        </Link>
+        <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+          <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
+        </Button>
+      </div>
+
+      {project && (
+        <UploadProject open={editOpen} onOpenChange={setEditOpen} initialData={project} />
+      )}
 
       <header className="space-y-6">
         <div className="space-y-4">

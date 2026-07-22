@@ -1,14 +1,18 @@
+import { useState } from "react";
 import { useGetPost, getGetPostQueryKey } from "@workspace/api-client-react";
 import { Link, useParams } from "wouter";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Markdown } from "@/components/markdown";
-import { ArrowLeft, Calendar, Clock, Tag } from "lucide-react";
+import { EditPost } from "@/components/edit-post";
+import { ArrowLeft, Calendar, Clock, Tag, Pencil } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default function PostDetail() {
   const params = useParams();
   const id = parseInt(params.id || "0", 10);
+  const [editOpen, setEditOpen] = useState(false);
   
   const { data: post, isLoading } = useGetPost(id, {
     query: { enabled: !!id, queryKey: getGetPostQueryKey(id) }
@@ -43,9 +47,16 @@ export default function PostDetail() {
 
   return (
     <article className="max-w-3xl mx-auto space-y-12">
-      <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back to Writing
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Writing
+        </Link>
+        <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+          <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
+        </Button>
+      </div>
+
+      <EditPost post={post} open={editOpen} onOpenChange={setEditOpen} />
 
       <header className="space-y-6">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">{post.title}</h1>
