@@ -73,6 +73,8 @@ export interface Post {
   tags?: string[];
   /** @nullable */
   readingTimeMinutes?: number | null;
+  /** @nullable */
+  coverImage?: string | null;
   visibility: Visibility;
   createdAt: string;
   updatedAt: string;
@@ -84,6 +86,7 @@ export interface PostInput {
   summary: string;
   body: string;
   tags?: string[];
+  readingTimeMinutes?: number;
   visibility?: Visibility;
 }
 
@@ -92,6 +95,7 @@ export interface PostUpdate {
   summary?: string;
   body?: string;
   tags?: string[];
+  readingTimeMinutes?: number;
   visibility?: Visibility;
 }
 

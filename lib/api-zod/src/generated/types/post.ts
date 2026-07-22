@@ -15,6 +15,8 @@ export interface Post {
   tags?: string[];
   /** @nullable */
   readingTimeMinutes?: number | null;
+  /** @nullable */
+  coverImage?: string | null;
   visibility: Visibility;
   createdAt: Date;
   updatedAt: Date;

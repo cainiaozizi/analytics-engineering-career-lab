@@ -13,5 +13,6 @@ export interface PostInput {
   summary: string;
   body: string;
   tags?: string[];
+  readingTimeMinutes?: number;
   visibility?: Visibility;
 }

@@ -12,5 +12,6 @@ export interface PostUpdate {
   summary?: string;
   body?: string;
   tags?: string[];
+  readingTimeMinutes?: number;
   visibility?: Visibility;
 }

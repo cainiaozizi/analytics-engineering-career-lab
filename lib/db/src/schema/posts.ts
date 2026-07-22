@@ -9,6 +9,7 @@ export const postsTable = pgTable("posts", {
   body: text("body").notNull(),
   tags: text("tags").array().notNull().default([]),
   readingTimeMinutes: integer("reading_time_minutes"),
+  coverImage: text("cover_image"),
   visibility: text("visibility").notNull().default("public"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),

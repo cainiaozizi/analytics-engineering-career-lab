@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  useUpdatePost, useFormatBody,
-  getListPostsQueryKey, getGetPostQueryKey,
+  useCreatePost, useFormatBody,
+  getListPostsQueryKey,
 } from "@workspace/api-client-react";
 import { useUpload } from "@workspace/object-storage-web";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -14,39 +14,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Markdown } from "@/components/markdown";
 import { TagPicker } from "@/components/tag-picker";
-import { Loader2, Wand2, CheckCircle2, ImageIcon, X, ArrowUpRight } from "lucide-react";
+import { Loader2, Wand2, ImageIcon, X, ArrowUpRight } from "lucide-react";
 
-interface Post {
-  id: number;
-  title: string;
-  summary: string;
-  body: string;
-  tags?: string[] | null;
-  visibility: "public" | "private" | "draft";
-}
-
-interface EditPostProps {
-  post: Post;
+interface CreatePostProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCreated?: (id: number) => void;
 }
 
-export function EditPost({ post, open, onOpenChange }: EditPostProps) {
-  const [fields, setFields] = useState({ ...post, tags: post.tags ?? [] });
-  const [saved, setSaved] = useState(false);
+const defaultFields = {
+  title: "",
+  summary: "",
+  body: "",
+  tags: [] as string[],
+  visibility: "draft" as "public" | "private" | "draft",
+  readingTimeMinutes: undefined as number | undefined,
+};
+
+export function CreatePost({ open, onOpenChange, onCreated }: CreatePostProps) {
+  const [fields, setFields] = useState({ ...defaultFields });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageName, setImageName] = useState("");
   const [imageObjectPath, setImageObjectPath] = useState("");
   const imageInputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
-
-  // Reset fields whenever the post prop changes (e.g. navigating between posts)
-  useEffect(() => {
-    setFields({ ...post, tags: post.tags ?? [] });
-    setImagePreview(null);
-    setImageName("");
-    setImageObjectPath("");
-  }, [post]);
 
   const queryClient = useQueryClient();
 
@@ -94,12 +85,13 @@ export function EditPost({ post, open, onOpenChange }: EditPostProps) {
     }
   }
 
-  const { mutate: updatePost, isPending } = useUpdatePost({
+  const { mutate: createPost, isPending } = useCreatePost({
     mutation: {
-      onSuccess: () => {
+      onSuccess: (post) => {
         queryClient.invalidateQueries({ queryKey: getListPostsQueryKey() });
-        queryClient.invalidateQueries({ queryKey: getGetPostQueryKey(post.id) });
-        setSaved(true);
+        onOpenChange(false);
+        setFields({ ...defaultFields });
+        onCreated?.(post.id);
       },
     },
   });
@@ -112,33 +104,35 @@ export function EditPost({ post, open, onOpenChange }: EditPostProps) {
 
   function set<K extends keyof typeof fields>(key: K, value: (typeof fields)[K]) {
     setFields(f => ({ ...f, [key]: value }));
-    setSaved(false);
   }
 
-  function handleSave() {
-    updatePost({
-      id: post.id,
+  function handleSubmit() {
+    createPost({
       data: {
         title: fields.title,
         summary: fields.summary,
         body: fields.body || undefined,
         tags: fields.tags,
         visibility: fields.visibility,
+        readingTimeMinutes: fields.readingTimeMinutes,
       },
     });
   }
 
   function handleClose() {
     onOpenChange(false);
-    setTimeout(() => setSaved(false), 300);
+    setTimeout(() => {
+      setFields({ ...defaultFields });
+      clearImage();
+    }, 300);
   }
 
   return (
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto flex flex-col gap-0 p-0">
         <SheetHeader className="px-6 pt-6 pb-4 border-b">
-          <SheetTitle>Edit Post</SheetTitle>
-          <SheetDescription>Update your post. Changes are saved immediately on click.</SheetDescription>
+          <SheetTitle>New Post</SheetTitle>
+          <SheetDescription>Create a new post. Fill in the details below and click Create post.</SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
@@ -168,6 +162,16 @@ export function EditPost({ post, open, onOpenChange }: EditPostProps) {
                   <SelectItem value="draft">Draft</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Reading time (min)</Label>
+              <Input
+                type="number"
+                min={1}
+                value={fields.readingTimeMinutes ?? ""}
+                onChange={e => set("readingTimeMinutes", e.target.value ? parseInt(e.target.value, 10) : undefined)}
+                placeholder="e.g. 5"
+              />
             </div>
           </div>
 
@@ -266,18 +270,11 @@ export function EditPost({ post, open, onOpenChange }: EditPostProps) {
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t flex items-center justify-between gap-3">
-          {saved && (
-            <span className="flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400">
-              <CheckCircle2 className="h-4 w-4" /> Saved
-            </span>
-          )}
-          <div className="flex gap-3 ml-auto">
-            <Button variant="ghost" onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleSave} disabled={isPending}>
-              {isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Saving…</> : "Save changes"}
-            </Button>
-          </div>
+        <div className="px-6 py-4 border-t flex items-center justify-end gap-3">
+          <Button variant="ghost" onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleSubmit} disabled={isPending || !fields.title.trim()}>
+            {isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Creating…</> : "Create post"}
+          </Button>
         </div>
       </SheetContent>
     </Sheet>

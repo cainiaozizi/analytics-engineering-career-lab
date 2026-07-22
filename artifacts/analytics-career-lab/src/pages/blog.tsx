@@ -1,19 +1,32 @@
+import { useState } from "react";
 import { useListPosts } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, PenLine } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { CreatePost } from "@/components/create-post";
 
 export default function Blog() {
   const { data: posts, isLoading } = useListPosts();
+  const [createOpen, setCreateOpen] = useState(false);
 
   return (
     <div className="space-y-10 max-w-3xl">
       <header className="space-y-4">
-        <h1 className="text-3xl font-bold tracking-tight">Writing</h1>
-        <p className="text-lg text-muted-foreground">Thoughts on data engineering, analytics, and software design.</p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-4">
+            <h1 className="text-3xl font-bold tracking-tight">Writing</h1>
+            <p className="text-lg text-muted-foreground">Thoughts on data engineering, analytics, and software design.</p>
+          </div>
+          <Button size="sm" onClick={() => setCreateOpen(true)} className="shrink-0 mt-1">
+            <PenLine className="w-3.5 h-3.5 mr-1.5" /> New post
+          </Button>
+        </div>
       </header>
+
+      <CreatePost open={createOpen} onOpenChange={setCreateOpen} />
 
       {isLoading ? (
         <div className="space-y-8">

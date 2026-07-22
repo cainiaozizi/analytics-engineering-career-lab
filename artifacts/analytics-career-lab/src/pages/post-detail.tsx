@@ -1,21 +1,39 @@
 import { useState } from "react";
-import { useGetPost, getGetPostQueryKey } from "@workspace/api-client-react";
-import { Link, useParams } from "wouter";
+import { useGetPost, useDeletePost, getGetPostQueryKey, getListPostsQueryKey } from "@workspace/api-client-react";
+import { Link, useParams, useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Markdown } from "@/components/markdown";
 import { EditPost } from "@/components/edit-post";
-import { ArrowLeft, Calendar, Clock, Tag, Pencil } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { ArrowLeft, Calendar, Clock, Tag, Pencil, Trash2, Loader2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default function PostDetail() {
   const params = useParams();
   const id = parseInt(params.id || "0", 10);
+  const [, navigate] = useLocation();
   const [editOpen, setEditOpen] = useState(false);
-  
+
+  const queryClient = useQueryClient();
+
   const { data: post, isLoading } = useGetPost(id, {
     query: { enabled: !!id, queryKey: getGetPostQueryKey(id) }
+  });
+
+  const { mutate: deletePost, isPending: isDeleting } = useDeletePost({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListPostsQueryKey() });
+        navigate("/blog");
+      },
+    },
   });
 
   if (isLoading) {
@@ -51,9 +69,36 @@ export default function PostDetail() {
         <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Writing
         </Link>
-        <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
-          <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+            <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
+                <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete post?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete "{post.title}". This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => deletePost({ id })}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Deleting…</> : "Delete"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       <EditPost post={post} open={editOpen} onOpenChange={setEditOpen} />

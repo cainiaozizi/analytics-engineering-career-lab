@@ -722,6 +722,8 @@ components:
             type: string
         readingTimeMinutes:
           type: ["integer", "null"]
+        coverImage:
+          type: ["string", "null"]
         visibility:
           $ref: "#/components/schemas/Visibility"
         createdAt:
@@ -746,6 +748,8 @@ components:
           type: array
           items:
             type: string
+        readingTimeMinutes:
+          type: integer
         visibility:
           $ref: "#/components/schemas/Visibility"
 
@@ -762,6 +766,8 @@ components:
           type: array
           items:
             type: string
+        readingTimeMinutes:
+          type: integer
         visibility:
           $ref: "#/components/schemas/Visibility"
 

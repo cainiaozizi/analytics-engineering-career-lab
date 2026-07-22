@@ -218,6 +218,7 @@ export const ListPostsResponseItem = zod.object({
   "body": zod.string(),
   "tags": zod.array(zod.string()).optional(),
   "readingTimeMinutes": zod.number().nullish(),
+  "coverImage": zod.string().nullish(),
   "visibility": zod.enum(['public', 'private', 'draft']),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -236,6 +237,7 @@ export const CreatePostBody = zod.object({
   "summary": zod.string(),
   "body": zod.string(),
   "tags": zod.array(zod.string()).optional(),
+  "readingTimeMinutes": zod.number().optional(),
   "visibility": zod.enum(['public', 'private', 'draft']).optional()
 })
 
@@ -246,6 +248,7 @@ export const CreatePostResponse = zod.object({
   "body": zod.string(),
   "tags": zod.array(zod.string()).optional(),
   "readingTimeMinutes": zod.number().nullish(),
+  "coverImage": zod.string().nullish(),
   "visibility": zod.enum(['public', 'private', 'draft']),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -266,6 +269,7 @@ export const GetPostResponse = zod.object({
   "body": zod.string(),
   "tags": zod.array(zod.string()).optional(),
   "readingTimeMinutes": zod.number().nullish(),
+  "coverImage": zod.string().nullish(),
   "visibility": zod.enum(['public', 'private', 'draft']),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -284,6 +288,7 @@ export const UpdatePostBody = zod.object({
   "summary": zod.string().optional(),
   "body": zod.string().optional(),
   "tags": zod.array(zod.string()).optional(),
+  "readingTimeMinutes": zod.number().optional(),
   "visibility": zod.enum(['public', 'private', 'draft']).optional()
 })
 
@@ -294,6 +299,7 @@ export const UpdatePostResponse = zod.object({
   "body": zod.string(),
   "tags": zod.array(zod.string()).optional(),
   "readingTimeMinutes": zod.number().nullish(),
+  "coverImage": zod.string().nullish(),
   "visibility": zod.enum(['public', 'private', 'draft']),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -537,6 +543,7 @@ export const GetHomepageDataResponse = zod.object({
   "body": zod.string(),
   "tags": zod.array(zod.string()).optional(),
   "readingTimeMinutes": zod.number().nullish(),
+  "coverImage": zod.string().nullish(),
   "visibility": zod.enum(['public', 'private', 'draft']),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
