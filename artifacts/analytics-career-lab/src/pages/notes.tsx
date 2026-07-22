@@ -1,18 +1,29 @@
+import { useState } from "react";
 import { useListNotes } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { CreateNote } from "@/components/create-note";
 import { formatDate } from "@/lib/utils";
-import { Bookmark, Hash } from "lucide-react";
+import { Hash, Plus } from "lucide-react";
 
 export default function Notes() {
   const { data: notes, isLoading } = useListNotes();
+  const [createOpen, setCreateOpen] = useState(false);
 
   return (
     <div className="space-y-8 max-w-3xl">
-      <header className="space-y-4">
-        <h1 className="text-3xl font-bold tracking-tight">Interview Prep</h1>
-        <p className="text-lg text-muted-foreground">Resources you've curated to help yourself and others.</p>
+      <header className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">Engineering Notes</h1>
+          <p className="text-lg text-muted-foreground">Short snippets, reference materials, and half-baked ideas.</p>
+        </div>
+        <Button onClick={() => setCreateOpen(true)} className="shrink-0">
+          <Plus className="w-4 h-4 mr-1.5" /> New note
+        </Button>
       </header>
+
+      <CreateNote open={createOpen} onOpenChange={setCreateOpen} />
 
       {isLoading ? (
         <div className="space-y-4">
@@ -27,7 +38,7 @@ export default function Notes() {
           {notes?.map((note) => (
             <Link 
               key={note.id} 
-              href={`/interview-prep/${note.id}`} 
+              href={`/notes/${note.id}`} 
               className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 p-4 border-b last:border-0 hover:bg-muted/50 transition-colors group"
             >
               <div className="flex-shrink-0 flex flex-row sm:flex-col justify-between sm:justify-start sm:w-28 gap-1">

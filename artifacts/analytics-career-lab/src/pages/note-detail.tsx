@@ -1,20 +1,44 @@
 import { useState } from "react";
-import { useGetNote, getGetNoteQueryKey } from "@workspace/api-client-react";
-import { Link, useParams } from "wouter";
+import { useGetNote, useDeleteNote, getGetNoteQueryKey, getListNotesQueryKey } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link, useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Markdown } from "@/components/markdown";
 import { EditNote } from "@/components/edit-note";
-import { ArrowLeft, Calendar, Hash, Pencil } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { ArrowLeft, Calendar, Hash, Pencil, Trash2, Loader2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default function NoteDetail() {
   const params = useParams();
   const id = parseInt(params.id || "0", 10);
+  const [, navigate] = useLocation();
   const [editOpen, setEditOpen] = useState(false);
+
+  const queryClient = useQueryClient();
   
   const { data: note, isLoading } = useGetNote(id, {
     query: { enabled: !!id, queryKey: getGetNoteQueryKey(id) }
+  });
+
+  const { mutate: deleteNote, isPending: isDeleting } = useDeleteNote({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListNotesQueryKey() });
+        navigate("/notes");
+      },
+    },
   });
 
   if (isLoading) {
@@ -47,9 +71,37 @@ export default function NoteDetail() {
         <Link href="/interview-prep" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Interview Prep
         </Link>
-        <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
-          <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
-        </Button>
+        <div className="flex items-center gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" disabled={isDeleting}>
+                {isDeleting
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <Trash2 className="w-3.5 h-3.5" />}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete note?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete "{note.title}". This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={() => deleteNote({ id })}
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+            <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
+          </Button>
+        </div>
       </div>
 
       <EditNote note={note} open={editOpen} onOpenChange={setEditOpen} />
