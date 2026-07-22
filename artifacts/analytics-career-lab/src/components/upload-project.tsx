@@ -8,8 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { Markdown } from "@/components/markdown";
-import { Upload, FileText, CheckCircle2 } from "lucide-react";
+import { Upload, FileText, CheckCircle2, Loader2 } from "lucide-react";
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface ParsedProject {
   title: string;
@@ -23,17 +26,39 @@ interface ParsedProject {
   featured: boolean;
 }
 
-function parseFrontmatter(raw: string): ParsedProject {
-  const defaults: ParsedProject = {
-    title: "", description: "", body: "", tags: "", techStack: "",
-    githubUrl: "", liveUrl: "", visibility: "draft", featured: false,
-  };
+const DEFAULTS: ParsedProject = {
+  title: "", description: "", body: "", tags: "", techStack: "",
+  githubUrl: "", liveUrl: "", visibility: "draft", featured: false,
+};
 
+type FileFormat = "md" | "pdf" | "docx";
+
+// ─── Parsers ─────────────────────────────────────────────────────────────────
+
+function readAsText(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target?.result as string);
+    reader.onerror = reject;
+    reader.readAsText(file);
+  });
+}
+
+function readAsArrayBuffer(file: File): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target?.result as ArrayBuffer);
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function parseFrontmatter(raw: string): ParsedProject {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
-  if (!match) return { ...defaults, body: raw.trim() };
+  if (!match) return { ...DEFAULTS, body: raw.trim() };
 
   const [, frontmatter, body] = match;
-  const result = { ...defaults, body: body.trim() };
+  const result: ParsedProject = { ...DEFAULTS, body: body.trim() };
 
   for (const line of frontmatter.split("\n")) {
     const colonIdx = line.indexOf(":");
@@ -41,7 +66,6 @@ function parseFrontmatter(raw: string): ParsedProject {
     const key = line.slice(0, colonIdx).trim();
     const value = line.slice(colonIdx + 1).trim();
     if (!value) continue;
-
     switch (key) {
       case "title":       result.title = value; break;
       case "description": result.description = value; break;
@@ -53,16 +77,80 @@ function parseFrontmatter(raw: string): ParsedProject {
         if (value === "public" || value === "private" || value === "draft")
           result.visibility = value;
         break;
-      case "featured":    result.featured = value === "true"; break;
+      case "featured": result.featured = value === "true"; break;
     }
   }
-
   return result;
+}
+
+async function parsePDF(file: File): Promise<ParsedProject> {
+  const pdfjsLib = await import("pdfjs-dist");
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://unpkg.com/pdfjs-dist@6.1.200/build/pdf.worker.min.mjs";
+
+  const arrayBuffer = await readAsArrayBuffer(file);
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+  const pages: string[] = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const pageText = (content.items as Array<{ str: string; hasEOL?: boolean }>)
+      .map(item => item.str + (item.hasEOL ? "\n" : ""))
+      .join("");
+    pages.push(pageText.trim());
+  }
+
+  const fullText = pages.join("\n\n");
+  const lines = fullText.split("\n").map(l => l.trim()).filter(Boolean);
+  const title = lines[0] ?? file.name.replace(/\.pdf$/i, "");
+  const body = lines.slice(1).join("\n\n");
+
+  return { ...DEFAULTS, title, body };
+}
+
+async function parseDOCX(file: File): Promise<ParsedProject> {
+  // mammoth doesn't ship ESM — use the browser bundle via dynamic import
+  const mammoth = await import("mammoth/mammoth.browser.js" as string) as {
+    default?: { convertToMarkdown: (opts: { arrayBuffer: ArrayBuffer }) => Promise<{ value: string }> };
+    convertToMarkdown?: (opts: { arrayBuffer: ArrayBuffer }) => Promise<{ value: string }>;
+  };
+  const api = mammoth.default ?? mammoth;
+  if (!api.convertToMarkdown) throw new Error("mammoth.convertToMarkdown not available");
+
+  const arrayBuffer = await readAsArrayBuffer(file);
+  const { value: markdown } = await api.convertToMarkdown({ arrayBuffer });
+
+  const lines = markdown.split("\n").filter(l => l.trim());
+  const h1 = lines.find(l => l.startsWith("# "));
+  const title = h1
+    ? h1.replace(/^#+ /, "").trim()
+    : file.name.replace(/\.docx$/i, "");
+
+  return { ...DEFAULTS, title, body: markdown.trim() };
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function detectFormat(filename: string): FileFormat | null {
+  const ext = filename.split(".").pop()?.toLowerCase();
+  if (ext === "md") return "md";
+  if (ext === "pdf") return "pdf";
+  if (ext === "docx") return "docx";
+  return null;
 }
 
 function toArray(csv: string): string[] {
   return csv.split(",").map(s => s.trim()).filter(Boolean);
 }
+
+const FORMAT_LABELS: Record<FileFormat, string> = {
+  md: "Markdown",
+  pdf: "PDF",
+  docx: "Word doc",
+};
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 interface UploadProjectProps {
   open: boolean;
@@ -72,7 +160,10 @@ interface UploadProjectProps {
 export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
+  const [format, setFormat] = useState<FileFormat | null>(null);
   const [fields, setFields] = useState<ParsedProject | null>(null);
+  const [isParsing, setIsParsing] = useState(false);
+  const [parseError, setParseError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const queryClient = useQueryClient();
@@ -85,16 +176,37 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
     },
   });
 
-  function handleFile(file: File) {
-    if (!file.name.endsWith(".md")) return;
+  async function handleFile(file: File) {
+    const fmt = detectFormat(file.name);
+    if (!fmt) {
+      setParseError("Unsupported format. Please upload a .md, .pdf, or .docx file.");
+      return;
+    }
+
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = e => {
-      const text = e.target?.result as string;
-      setFields(parseFrontmatter(text));
-      setSubmitted(false);
-    };
-    reader.readAsText(file);
+    setFormat(fmt);
+    setIsParsing(true);
+    setParseError(null);
+    setSubmitted(false);
+    setFields(null);
+
+    try {
+      let parsed: ParsedProject;
+      if (fmt === "md") {
+        const text = await readAsText(file);
+        parsed = parseFrontmatter(text);
+      } else if (fmt === "pdf") {
+        parsed = await parsePDF(file);
+      } else {
+        parsed = await parseDOCX(file);
+      }
+      setFields(parsed);
+    } catch (err) {
+      console.error(err);
+      setParseError("Couldn't parse this file. Try a different format or paste the content manually.");
+    } finally {
+      setIsParsing(false);
+    }
   }
 
   function handleDrop(e: React.DragEvent) {
@@ -103,7 +215,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
     if (file) handleFile(file);
   }
 
-  function set(key: keyof ParsedProject, value: string | boolean) {
+  function set<K extends keyof ParsedProject>(key: K, value: ParsedProject[K]) {
     setFields(f => f ? { ...f, [key]: value } : f);
   }
 
@@ -129,8 +241,18 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
     setTimeout(() => {
       setFields(null);
       setFileName("");
+      setFormat(null);
       setSubmitted(false);
+      setParseError(null);
     }, 300);
+  }
+
+  function reset() {
+    setFields(null);
+    setFileName("");
+    setFormat(null);
+    setSubmitted(false);
+    setParseError(null);
   }
 
   return (
@@ -139,16 +261,24 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
         <SheetHeader className="px-6 pt-6 pb-4 border-b">
           <SheetTitle>Upload Project</SheetTitle>
           <SheetDescription>
-            Upload a <code className="text-xs bg-muted px-1 py-0.5 rounded">.md</code> file
-            using the project template. Review the fields, then publish or save as draft.
+            Upload a <code className="text-xs bg-muted px-1 py-0.5 rounded">.md</code>,{" "}
+            <code className="text-xs bg-muted px-1 py-0.5 rounded">.pdf</code>, or{" "}
+            <code className="text-xs bg-muted px-1 py-0.5 rounded">.docx</code> file.
+            Fields are pre-filled from your document — review and publish.
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+
           {/* Drop zone */}
           <div
-            className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer
-              ${fileName ? "border-primary/40 bg-primary/5" : "border-muted-foreground/25 hover:border-primary/40 hover:bg-muted/50"}`}
+            className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer select-none
+              ${fileName && !parseError
+                ? "border-primary/40 bg-primary/5"
+                : parseError
+                ? "border-destructive/40 bg-destructive/5"
+                : "border-muted-foreground/25 hover:border-primary/40 hover:bg-muted/50"
+              }`}
             onClick={() => fileInputRef.current?.click()}
             onDrop={handleDrop}
             onDragOver={e => e.preventDefault()}
@@ -156,26 +286,41 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".md"
+              accept=".md,.pdf,.docx"
               className="hidden"
-              onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+              onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }}
             />
-            {fileName ? (
+            {isParsing ? (
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                <Loader2 className="w-8 h-8 animate-spin" />
+                <p className="text-sm font-medium">Parsing {fileName}…</p>
+              </div>
+            ) : fileName && !parseError ? (
               <div className="flex flex-col items-center gap-2">
                 <FileText className="w-8 h-8 text-primary" />
-                <p className="text-sm font-medium">{fileName}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium">{fileName}</p>
+                  {format && <Badge variant="outline" className="text-xs">{FORMAT_LABELS[format]}</Badge>}
+                </div>
                 <p className="text-xs text-muted-foreground">Click to replace</p>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
                 <Upload className="w-8 h-8 text-muted-foreground" />
-                <p className="text-sm font-medium">Drop your .md file here</p>
-                <p className="text-xs text-muted-foreground">or click to browse</p>
+                <p className="text-sm font-medium">Drop your file here</p>
+                <p className="text-xs text-muted-foreground">.md · .pdf · .docx — or click to browse</p>
               </div>
             )}
           </div>
 
-          {/* Success state */}
+          {/* Parse error */}
+          {parseError && (
+            <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+              {parseError}
+            </div>
+          )}
+
+          {/* Success */}
           {submitted && (
             <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800">
               <CheckCircle2 className="w-5 h-5 shrink-0" />
@@ -201,7 +346,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Description <span className="text-destructive">*</span></Label>
+                  <Label>Description</Label>
                   <Textarea
                     value={fields.description}
                     onChange={e => set("description", e.target.value)}
@@ -213,7 +358,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label>Visibility</Label>
-                    <Select value={fields.visibility} onValueChange={v => set("visibility", v)}>
+                    <Select value={fields.visibility} onValueChange={v => set("visibility", v as ParsedProject["visibility"])}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="public">Public</SelectItem>
@@ -236,21 +381,13 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
 
                 <div className="space-y-1.5">
                   <Label>Tech Stack</Label>
-                  <Input
-                    value={fields.techStack}
-                    onChange={e => set("techStack", e.target.value)}
-                    placeholder="Python, dbt, BigQuery"
-                  />
+                  <Input value={fields.techStack} onChange={e => set("techStack", e.target.value)} placeholder="Python, dbt, BigQuery" />
                   <p className="text-xs text-muted-foreground">Comma-separated</p>
                 </div>
 
                 <div className="space-y-1.5">
                   <Label>Tags</Label>
-                  <Input
-                    value={fields.tags}
-                    onChange={e => set("tags", e.target.value)}
-                    placeholder="dbt, data-modeling, python"
-                  />
+                  <Input value={fields.tags} onChange={e => set("tags", e.target.value)} placeholder="dbt, data-modeling, python" />
                   <p className="text-xs text-muted-foreground">Comma-separated, lowercase</p>
                 </div>
 
@@ -269,7 +406,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
                   <Textarea
                     value={fields.body}
                     onChange={e => set("body", e.target.value)}
-                    placeholder="Full project write-up in Markdown..."
+                    placeholder="Full project write-up in Markdown…"
                     rows={10}
                     className="font-mono text-sm"
                   />
@@ -291,22 +428,15 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
           )}
         </div>
 
-        {/* Footer actions */}
+        {/* Footer */}
         {fields && !submitted && (
           <div className="px-6 py-4 border-t flex items-center justify-between gap-3 bg-background">
             <Button variant="outline" onClick={handleClose}>Cancel</Button>
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                disabled={!fields.title || isPending}
-                onClick={() => handleSubmit("draft")}
-              >
+              <Button variant="outline" disabled={!fields.title || isPending} onClick={() => handleSubmit("draft")}>
                 Save as Draft
               </Button>
-              <Button
-                disabled={!fields.title || isPending}
-                onClick={() => handleSubmit("public")}
-              >
+              <Button disabled={!fields.title || isPending} onClick={() => handleSubmit("public")}>
                 {isPending ? "Publishing…" : "Publish"}
               </Button>
             </div>
@@ -315,9 +445,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
 
         {submitted && (
           <div className="px-6 py-4 border-t flex justify-end gap-3 bg-background">
-            <Button variant="outline" onClick={() => { setFields(null); setFileName(""); setSubmitted(false); }}>
-              Upload another
-            </Button>
+            <Button variant="outline" onClick={reset}>Upload another</Button>
             <Button onClick={handleClose}>Done</Button>
           </div>
         )}
