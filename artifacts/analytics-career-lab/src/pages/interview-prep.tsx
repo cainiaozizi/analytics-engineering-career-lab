@@ -21,7 +21,7 @@ export default function InterviewPrep() {
       <aside className="w-full md:w-64 flex-shrink-0 space-y-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Interview Prep</h1>
-          <p className="text-sm text-muted-foreground mt-1">Study materials and Q&A.</p>
+          <p className="text-sm text-muted-foreground mt-1">Resources you've curated to help yourself and others.</p>
         </div>
 
         {topicsLoading ? (

@@ -18,7 +18,7 @@ export default function Projects() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <p className="text-muted-foreground mt-2">Data pipelines, dashboards, and engineering experiments.</p>
+          <p className="text-muted-foreground mt-2">What you've built.</p>
         </div>
         <Button variant="outline" className="shrink-0" onClick={() => setUploadOpen(true)}>
           <Upload className="w-4 h-4 mr-2" /> Upload .md

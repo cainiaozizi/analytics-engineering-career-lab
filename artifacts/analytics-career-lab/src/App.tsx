@@ -25,8 +25,8 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/projects" component={Projects} />
         <Route path="/projects/:id" component={ProjectDetail} />
-        <Route path="/blog" component={Blog} />
-        <Route path="/blog/:id" component={PostDetail} />
+        <Route path="/guides" component={Blog} />
+        <Route path="/guides/:id" component={PostDetail} />
         <Route path="/notes" component={Notes} />
         <Route path="/notes/:id" component={NoteDetail} />
         <Route path="/interview-prep" component={InterviewPrep} />

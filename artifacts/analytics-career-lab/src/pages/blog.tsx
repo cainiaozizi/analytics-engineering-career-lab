@@ -17,8 +17,8 @@ export default function Blog() {
       <header className="space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-4">
-            <h1 className="text-3xl font-bold tracking-tight">Writing</h1>
-            <p className="text-lg text-muted-foreground">Thoughts on data engineering, analytics, and software design.</p>
+            <h1 className="text-3xl font-bold tracking-tight">Guides</h1>
+            <p className="text-lg text-muted-foreground">What you know.</p>
           </div>
           <Button size="sm" onClick={() => setCreateOpen(true)} className="shrink-0 mt-1">
             <PenLine className="w-3.5 h-3.5 mr-1.5" /> New post
@@ -59,7 +59,7 @@ export default function Blog() {
               </div>
               <div className="group relative w-full">
                 <h3 className="mt-3 text-2xl font-semibold leading-tight text-foreground group-hover:text-primary transition-colors">
-                  <Link href={`/blog/${post.id}`}>
+                  <Link href={`/guides/${post.id}`}>
                     <span className="absolute inset-0" />
                     {post.title}
                   </Link>

@@ -57,7 +57,7 @@ export default function Home() {
                 {searchResults?.results?.map((result) => (
                   <Link 
                     key={`${result.type}-${result.id}`} 
-                    href={result.type === 'project' ? `/projects/${result.id}` : result.type === 'post' ? `/blog/${result.id}` : result.type === 'note' ? `/notes/${result.id}` : `/interview-prep/${result.id}`}
+                    href={result.type === 'project' ? `/projects/${result.id}` : result.type === 'post' ? `/guides/${result.id}` : result.type === 'note' ? `/notes/${result.id}` : `/interview-prep/${result.id}`}
                     className="flex flex-col p-4 border-b last:border-0 hover:bg-accent/50 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -137,13 +137,13 @@ export default function Home() {
               <section className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold tracking-tight">Writing</h2>
-                  <Link href="/blog" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
+                  <Link href="/guides" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
                     All posts <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
                 <div className="space-y-4">
                   {home.featuredKnowledge.map(post => (
-                    <Link key={post.id} href={`/blog/${post.id}`} className="group block">
+                    <Link key={post.id} href={`/guides/${post.id}`} className="group block">
                       <div className="p-4 rounded-xl border border-transparent hover:border-border hover:bg-card transition-all">
                         <div className="flex items-baseline justify-between mb-1">
                           <h3 className="font-semibold group-hover:text-primary transition-colors">{post.title}</h3>
