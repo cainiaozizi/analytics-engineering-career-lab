@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Markdown } from "@/components/markdown";
-import { Upload, FileText, CheckCircle2, Loader2, Wand2, ImageIcon, X } from "lucide-react";
+import { Upload, FileText, CheckCircle2, Loader2, Wand2, ImageIcon, X, ArrowUpRight } from "lucide-react";
 import { TagPicker } from "@/components/tag-picker";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -180,7 +180,9 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageName, setImageName] = useState<string>("");
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   const { uploadFile, isUploading: isUploadingImage } = useUpload({
     onSuccess: (response) => {
@@ -190,16 +192,42 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
 
   async function handleImageFile(file: File) {
     if (!file.type.startsWith("image/")) return;
-    // Show local preview immediately
+    setImageName(file.name.replace(/\.[^.]+$/, ""));
     setImagePreview(URL.createObjectURL(file));
-    // Upload to object storage
     await uploadFile(file);
   }
 
   function clearImage() {
     set("imageUrl", "");
     setImagePreview(null);
+    setImageName("");
     if (imageInputRef.current) imageInputRef.current.value = "";
+  }
+
+  function insertImageIntoBody() {
+    if (!fields?.imageUrl) return;
+    const md = `![${imageName || "image"}](/api/storage${fields.imageUrl})`;
+    const ta = bodyRef.current;
+    if (ta) {
+      const start = ta.selectionStart ?? fields.body.length;
+      const end = ta.selectionEnd ?? start;
+      const before = fields.body.slice(0, start);
+      const after = fields.body.slice(end);
+      const needsNewline = before.length > 0 && !before.endsWith("\n");
+      const inserted = (needsNewline ? "\n\n" : "") + md + "\n";
+      set("body", before + inserted + after);
+      // Restore cursor after the inserted text
+      requestAnimationFrame(() => {
+        if (ta) {
+          const pos = start + inserted.length + (needsNewline ? 2 : 0);
+          ta.selectionStart = ta.selectionEnd = pos;
+          ta.focus();
+        }
+      });
+    } else {
+      // Fallback: append to end
+      set("body", (fields.body ? fields.body + "\n\n" : "") + md + "\n");
+    }
   }
 
   const { mutate: formatBody, isPending: isFormatting } = useFormatBody({
@@ -444,24 +472,36 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
                 <div className="space-y-1.5">
                   <Label>Cover Image</Label>
                   {imagePreview || fields.imageUrl ? (
-                    <div className="relative rounded-lg overflow-hidden border bg-muted aspect-video">
-                      <img
-                        src={imagePreview ?? `/api/storage${fields.imageUrl}`}
-                        alt="Cover preview"
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={clearImage}
-                        className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full p-1 hover:bg-background transition-colors"
-                        aria-label="Remove image"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                      {isUploadingImage && (
-                        <div className="absolute inset-0 bg-background/60 flex items-center justify-center gap-2 text-sm">
-                          <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
-                        </div>
+                    <div className="space-y-2">
+                      <div className="relative rounded-lg overflow-hidden border bg-muted aspect-video">
+                        <img
+                          src={imagePreview ?? `/api/storage${fields.imageUrl}`}
+                          alt="Cover preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={clearImage}
+                          className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full p-1 hover:bg-background transition-colors"
+                          aria-label="Remove image"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                        {isUploadingImage && (
+                          <div className="absolute inset-0 bg-background/60 flex items-center justify-center gap-2 text-sm">
+                            <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
+                          </div>
+                        )}
+                      </div>
+                      {fields.imageUrl && !isUploadingImage && (
+                        <button
+                          type="button"
+                          onClick={insertImageIntoBody}
+                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <ArrowUpRight className="h-3.5 w-3.5" />
+                          Insert into body
+                        </button>
                       )}
                     </div>
                   ) : (
@@ -510,6 +550,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
                     </button>
                   </div>
                   <Textarea
+                    ref={bodyRef}
                     value={fields.body}
                     onChange={e => set("body", e.target.value)}
                     placeholder="Full project write-up in Markdown…"
