@@ -470,7 +470,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
 
                 {/* Image upload */}
                 <div className="space-y-1.5">
-                  <Label>Cover Image</Label>
+                  <Label>Image</Label>
                   {imagePreview || fields.imageUrl ? (
                     <div className="space-y-2">
                       <div className="relative rounded-lg overflow-hidden border bg-muted aspect-video">
@@ -511,7 +511,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
                       className="w-full border border-dashed rounded-lg p-6 flex flex-col items-center gap-2 text-sm text-muted-foreground hover:border-foreground/40 hover:text-foreground transition-colors"
                     >
                       <ImageIcon className="h-8 w-8 opacity-40" />
-                      <span>Click to attach a cover image</span>
+                      <span>Click to attach an image</span>
                       <span className="text-xs">PNG, JPG, WebP, GIF</span>
                     </button>
                   )}
