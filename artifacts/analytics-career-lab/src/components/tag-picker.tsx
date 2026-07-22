@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TAXONOMY } from "@/lib/taxonomy";
-import { X, ChevronDown, ChevronRight } from "lucide-react";
+import { X, ChevronDown, ChevronRight, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── TagPicker ────────────────────────────────────────────────────────────────
@@ -43,13 +43,35 @@ export function TagPicker({ value, onChange, max, className }: TagPickerProps) {
     setCollapsed(prev => ({ ...prev, [label]: !prev[label] }));
   }
 
-  const query = search.trim().toLowerCase();
+  const trimmed = search.trim();
+  const query = trimmed.toLowerCase();
 
   // Filter taxonomy to categories that have matching tags
   const filtered = TAXONOMY.map(cat => ({
     ...cat,
     tags: cat.tags.filter(t => !query || t.toLowerCase().includes(query)),
   })).filter(cat => cat.tags.length > 0);
+
+  // Show "Add" option when the typed text isn't already in the taxonomy or selected
+  const allTaxonomyTags = TAXONOMY.flatMap(c => c.tags).map(t => t.toLowerCase());
+  const canAddCustom =
+    trimmed.length > 0 &&
+    !allTaxonomyTags.includes(query) &&
+    !selected.has(trimmed) &&
+    !(max !== undefined && value.length >= max);
+
+  function addCustomTag() {
+    if (!canAddCustom) return;
+    onChange([...value, trimmed]);
+    setSearch("");
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addCustomTag();
+    }
+  }
 
   return (
     <div className={cn("space-y-3", className)}>
@@ -87,16 +109,29 @@ export function TagPicker({ value, onChange, max, className }: TagPickerProps) {
       <Input
         value={search}
         onChange={e => setSearch(e.target.value)}
-        placeholder="Search tags…"
+        onKeyDown={handleKeyDown}
+        placeholder="Search or type a new tag…"
         className="h-8 text-sm"
       />
 
       {/* Taxonomy groups */}
       <div className="border rounded-lg divide-y max-h-72 overflow-y-auto">
-        {filtered.length === 0 && (
+        {filtered.length === 0 && !canAddCustom && (
           <p className="px-3 py-4 text-sm text-muted-foreground text-center">
             No tags match "{search}"
           </p>
+        )}
+
+        {canAddCustom && (
+          <button
+            type="button"
+            onClick={addCustomTag}
+            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/50 transition-colors text-left"
+          >
+            <Plus className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            <span>Add <span className="font-medium">"{trimmed}"</span></span>
+            <span className="ml-auto text-xs text-muted-foreground">↵ Enter</span>
+          </button>
         )}
 
         {filtered.map(cat => {
