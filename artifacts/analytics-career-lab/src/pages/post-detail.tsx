@@ -2,6 +2,7 @@ import { useGetPost, getGetPostQueryKey } from "@workspace/api-client-react";
 import { Link, useParams } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Markdown } from "@/components/markdown";
 import { ArrowLeft, Calendar, Clock, Tag } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -27,7 +28,17 @@ export default function PostDetail() {
   }
 
   if (!post) {
-    return <div>Post not found.</div>;
+    return (
+      <div className="max-w-3xl space-y-4">
+        <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Writing
+        </Link>
+        <div className="border border-dashed rounded-xl p-12 text-center space-y-2">
+          <p className="text-lg font-medium">Post not found</p>
+          <p className="text-sm text-muted-foreground">This post may have been removed or the link is incorrect.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -57,14 +68,8 @@ export default function PostDetail() {
       </header>
 
       {post.body && (
-        <section className="prose prose-slate dark:prose-invert prose-lg max-w-none prose-headings:font-semibold prose-a:text-primary">
-          {/* Simulated markdown rendering */}
-          {post.body.split('\n\n').map((paragraph, idx) => {
-            if (paragraph.startsWith('# ')) return <h1 key={idx}>{paragraph.replace('# ', '')}</h1>;
-            if (paragraph.startsWith('## ')) return <h2 key={idx}>{paragraph.replace('## ', '')}</h2>;
-            if (paragraph.startsWith('### ')) return <h3 key={idx}>{paragraph.replace('### ', '')}</h3>;
-            return <p key={idx}>{paragraph}</p>;
-          })}
+        <section>
+          <Markdown className="prose-lg">{post.body}</Markdown>
         </section>
       )}
 

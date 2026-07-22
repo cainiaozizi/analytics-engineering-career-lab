@@ -2,6 +2,7 @@ import { useGetProject, getGetProjectQueryKey } from "@workspace/api-client-reac
 import { Link, useParams } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Markdown } from "@/components/markdown";
 import { ArrowLeft, Github, ExternalLink, Calendar, Tag } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -27,7 +28,17 @@ export default function ProjectDetail() {
   }
 
   if (!project) {
-    return <div>Project not found.</div>;
+    return (
+      <div className="max-w-3xl space-y-4">
+        <Link href="/projects" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Projects
+        </Link>
+        <div className="border border-dashed rounded-xl p-12 text-center space-y-2">
+          <p className="text-lg font-medium">Project not found</p>
+          <p className="text-sm text-muted-foreground">This project may have been removed or the link is incorrect.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -77,11 +88,8 @@ export default function ProjectDetail() {
       )}
 
       {project.body && (
-        <section className="prose prose-slate dark:prose-invert max-w-none">
-          {/* Simulated markdown rendering since we don't have a markdown parser installed */}
-          {project.body.split('\n\n').map((paragraph, idx) => (
-            <p key={idx}>{paragraph}</p>
-          ))}
+        <section>
+          <Markdown>{project.body}</Markdown>
         </section>
       )}
 

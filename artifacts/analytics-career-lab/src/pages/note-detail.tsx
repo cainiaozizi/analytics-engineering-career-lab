@@ -1,6 +1,7 @@
 import { useGetNote, getGetNoteQueryKey } from "@workspace/api-client-react";
 import { Link, useParams } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Markdown } from "@/components/markdown";
 import { ArrowLeft, Calendar, Hash } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -23,7 +24,17 @@ export default function NoteDetail() {
   }
 
   if (!note) {
-    return <div>Note not found.</div>;
+    return (
+      <div className="max-w-2xl space-y-4">
+        <Link href="/notes" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Notes
+        </Link>
+        <div className="border border-dashed rounded-xl p-12 text-center space-y-2">
+          <p className="text-lg font-medium">Note not found</p>
+          <p className="text-sm text-muted-foreground">This note may have been removed or the link is incorrect.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -42,19 +53,7 @@ export default function NoteDetail() {
         </header>
 
         <div className="p-6">
-          <div className="prose prose-slate dark:prose-invert prose-sm max-w-none">
-            {note.body.split('\n\n').map((paragraph, idx) => {
-              if (paragraph.startsWith('```')) {
-                const code = paragraph.replace(/```\w*\n?/, '').replace(/```$/, '');
-                return (
-                  <pre key={idx} className="bg-muted p-4 rounded-lg overflow-x-auto text-sm font-mono my-4">
-                    <code>{code}</code>
-                  </pre>
-                );
-              }
-              return <p key={idx}>{paragraph}</p>;
-            })}
-          </div>
+          <Markdown className="prose-sm">{note.body}</Markdown>
         </div>
 
         {note.tags && note.tags.length > 0 && (
