@@ -7,10 +7,10 @@ import { Layout } from '@/components/layout';
 import Home from '@/pages/home';
 import Projects from '@/pages/projects';
 import ProjectDetail from '@/pages/project-detail';
-import Blog from '@/pages/blog';
-import PostDetail from '@/pages/post-detail';
-import Notes from '@/pages/notes';
-import NoteDetail from '@/pages/note-detail';
+import Guides from '@/pages/guides';
+import GuideDetail from '@/pages/guide-detail';
+import InterviewPrep from '@/pages/interview-prep';
+import InterviewPrepDetail from '@/pages/interview-prep-detail';
 import About from '@/pages/about';
 import NotFound from '@/pages/not-found';
 
@@ -23,10 +23,10 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/projects" component={Projects} />
         <Route path="/projects/:id" component={ProjectDetail} />
-        <Route path="/guides" component={Blog} />
-        <Route path="/guides/:id" component={PostDetail} />
-        <Route path="/interview-prep" component={Notes} />
-        <Route path="/interview-prep/:id" component={NoteDetail} />
+        <Route path="/guides" component={Guides} />
+        <Route path="/guides/:id" component={GuideDetail} />
+        <Route path="/interview-prep" component={InterviewPrep} />
+        <Route path="/interview-prep/:id" component={InterviewPrepDetail} />
         <Route path="/about" component={About} />
         <Route component={NotFound} />
       </Switch>

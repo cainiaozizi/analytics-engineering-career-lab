@@ -18,7 +18,7 @@ export default function Blog() {
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-4">
             <h1 className="text-3xl font-bold tracking-tight">Guides</h1>
-            <p className="text-lg text-muted-foreground">What you know.</p>
+            <p className="text-lg text-muted-foreground">What I know </p>
           </div>
           <Button size="sm" onClick={() => setCreateOpen(true)} className="shrink-0 mt-1">
             <PenLine className="w-3.5 h-3.5 mr-1.5" /> New post

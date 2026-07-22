@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { useListProjects } from "@workspace/api-client-react";
 import { Link } from "wouter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -18,10 +24,14 @@ export default function Projects() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <p className="text-muted-foreground mt-2">What you've built.</p>
+          <p className="text-lg text-muted-foreground">What I built </p>
         </div>
-        <Button variant="outline" className="shrink-0" onClick={() => setUploadOpen(true)}>
-          <Upload className="w-4 h-4 mr-2" /> Upload .md
+        <Button
+          variant="outline"
+          className="shrink-0"
+          onClick={() => setUploadOpen(true)}
+        >
+          <Upload className="w-4 h-4 mr-2" /> Upload
         </Button>
       </div>
 
@@ -40,14 +50,23 @@ export default function Projects() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects?.map((project) => (
-            <Link key={project.id} href={`/projects/${project.id}`} className="group h-full block">
+            <Link
+              key={project.id}
+              href={`/projects/${project.id}`}
+              className="group h-full block"
+            >
               <Card className="h-full flex flex-col transition-all hover:border-primary/50 hover:shadow-md overflow-hidden">
                 <CardHeader>
                   <div className="flex justify-between items-start mb-2">
                     <CardTitle className="group-hover:text-primary transition-colors text-xl leading-tight">
                       {project.title}
                     </CardTitle>
-                    <Badge variant={project.visibility as any} className="shrink-0">{project.visibility}</Badge>
+                    <Badge
+                      variant={project.visibility as any}
+                      className="shrink-0"
+                    >
+                      {project.visibility}
+                    </Badge>
                   </div>
                   <CardDescription className="line-clamp-3 text-base">
                     {project.description}
@@ -55,8 +74,11 @@ export default function Projects() {
                 </CardHeader>
                 <CardContent className="mt-auto pt-0 space-y-4">
                   <div className="flex flex-wrap gap-2">
-                    {project.techStack?.map(tech => (
-                      <span key={tech} className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                    {project.techStack?.map((tech) => (
+                      <span
+                        key={tech}
+                        className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded-md"
+                      >
                         {tech}
                       </span>
                     ))}

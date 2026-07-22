@@ -26,41 +26,28 @@ export const TAXONOMY: TagCategory[] = [
     ],
   },
   {
-    label: "Engineering",
+    label: "Analytics Engineering",
     emoji: "🏗",
     tags: [
-      "Analytics Engineering",
       "Data Modeling",
       "Semantic Layer",
-      "ELT",
       "Data Warehouse",
-      "Dimensional Modeling",
-      "ETL Migration",
-    ],
-  },
-  {
-    label: "Governance",
-    emoji: "🛡",
-    tags: [
+      "ELT",
       "Data Governance",
       "Data Quality",
-      "dbt Testing",
-      "Observability",
-      "Lineage",
-      "Documentation",
-      "Audit",
-      "SOX",
+      "Metric Design",
+      "Dimensional Modeling",
     ],
   },
   {
     label: "Technology",
     emoji: "⚙️",
     tags: [
+      "SQL",
+      "Python",
       "dbt",
       "Snowflake",
       "BigQuery",
-      "SQL",
-      "Python",
       "Looker",
       "Tableau",
       "Airflow",
@@ -72,21 +59,33 @@ export const TAXONOMY: TagCategory[] = [
     emoji: "🧠",
     tags: [
       "Reconciliation",
-      "Feature Engineering",
-      "Entity Resolution",
-      "Account Hierarchy",
-      "Slowly Changing Dimensions",
-      "Event Modeling",
-      "Time Series",
-      "Metric Design",
-      "Cost Attribution",
       "Revenue Recognition",
+      "Cost Attribution",
+      "Event Modeling",
+      "Entity Resolution",
+      "Slowly Changing Dimensions",
+      "Account Hierarchy",
+      "Time Series",
+    ],
+  },
+  {
+    label: "Interview Prep",
+    emoji: "🎯",
+    tags: [
+      "SQL",
+      "Python",
+      "System Design",
+      "Behavioral",
+      "Case Study",
+      "Coding Challenge",
+      "LeetCode",
+      "Architecture",
     ],
   },
 ];
 
 /** Flat set of all canonical tag strings — use for validation or autocomplete filtering. */
-export const TAG_SET = new Set(TAXONOMY.flatMap(c => c.tags));
+export const TAG_SET = new Set(TAXONOMY.flatMap((c) => c.tags));
 
 /** All tags as a sorted flat array. */
-export const ALL_TAGS = TAXONOMY.flatMap(c => c.tags);
+export const ALL_TAGS = TAXONOMY.flatMap((c) => c.tags);
