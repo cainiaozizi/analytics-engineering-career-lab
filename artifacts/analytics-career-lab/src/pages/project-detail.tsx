@@ -74,6 +74,16 @@ export default function ProjectDetail() {
         </div>
       </header>
 
+      {project.imageUrl && (
+        <div className="rounded-xl overflow-hidden border aspect-video bg-muted">
+          <img
+            src={`/api/storage${project.imageUrl}`}
+            alt={project.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       {project.techStack && project.techStack.length > 0 && (
         <section className="bg-card border rounded-xl p-6">
           <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">Tech Stack</h3>

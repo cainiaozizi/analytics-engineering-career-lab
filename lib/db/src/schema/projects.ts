@@ -11,6 +11,7 @@ export const projectsTable = pgTable("projects", {
   githubUrl: text("github_url"),
   liveUrl: text("live_url"),
   techStack: text("tech_stack").array().notNull().default([]),
+  imageUrl: text("image_url"),
   visibility: text("visibility").notNull().default("public"),
   featured: boolean("featured").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

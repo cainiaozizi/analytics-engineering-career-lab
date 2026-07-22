@@ -18,6 +18,8 @@ export interface Project {
   githubUrl?: string | null;
   /** @nullable */
   liveUrl?: string | null;
+  /** @nullable */
+  imageUrl?: string | null;
   techStack?: string[];
   visibility: Visibility;
   featured: boolean;

@@ -16,6 +16,7 @@ export interface ProjectInput {
   githubUrl?: string;
   liveUrl?: string;
   techStack?: string[];
+  imageUrl?: string;
   visibility?: Visibility;
   featured?: boolean;
 }

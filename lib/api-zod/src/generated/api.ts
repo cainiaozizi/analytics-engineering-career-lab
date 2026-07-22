@@ -9,6 +9,46 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary Request a presigned URL for file upload
+ */
+
+
+
+
+
+export const RequestUploadUrlBody = zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().min(1),
+  "contentType": zod.string().min(1)
+})
+
+export const RequestUploadUrlResponse = zod.object({
+  "uploadURL": zod.string(),
+  "objectPath": zod.string()
+})
+
+
+/**
+ * @summary Serve a public asset
+ */
+export const GetPublicObjectParams = zod.object({
+  "filePath": zod.coerce.string()
+})
+
+export const GetPublicObjectResponse = zod.unknown()
+
+
+/**
+ * @summary Serve an uploaded object
+ */
+export const GetStorageObjectParams = zod.object({
+  "objectPath": zod.coerce.string()
+})
+
+export const GetStorageObjectResponse = zod.unknown()
+
+
+/**
  * @summary Clean and reformat raw body text into well-structured Markdown
  */
 export const FormatBodyBody = zod.object({
@@ -46,6 +86,7 @@ export const ListProjectsResponseItem = zod.object({
   "tags": zod.array(zod.string()).optional(),
   "githubUrl": zod.string().nullish(),
   "liveUrl": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
   "techStack": zod.array(zod.string()).optional(),
   "visibility": zod.enum(['public', 'private', 'draft']),
   "featured": zod.boolean(),
@@ -69,6 +110,7 @@ export const CreateProjectBody = zod.object({
   "githubUrl": zod.string().optional(),
   "liveUrl": zod.string().optional(),
   "techStack": zod.array(zod.string()).optional(),
+  "imageUrl": zod.string().optional(),
   "visibility": zod.enum(['public', 'private', 'draft']).optional(),
   "featured": zod.boolean().optional()
 })
@@ -81,6 +123,7 @@ export const CreateProjectResponse = zod.object({
   "tags": zod.array(zod.string()).optional(),
   "githubUrl": zod.string().nullish(),
   "liveUrl": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
   "techStack": zod.array(zod.string()).optional(),
   "visibility": zod.enum(['public', 'private', 'draft']),
   "featured": zod.boolean(),
@@ -104,6 +147,7 @@ export const GetProjectResponse = zod.object({
   "tags": zod.array(zod.string()).optional(),
   "githubUrl": zod.string().nullish(),
   "liveUrl": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
   "techStack": zod.array(zod.string()).optional(),
   "visibility": zod.enum(['public', 'private', 'draft']),
   "featured": zod.boolean(),
@@ -127,6 +171,7 @@ export const UpdateProjectBody = zod.object({
   "githubUrl": zod.string().optional(),
   "liveUrl": zod.string().optional(),
   "techStack": zod.array(zod.string()).optional(),
+  "imageUrl": zod.string().optional(),
   "visibility": zod.enum(['public', 'private', 'draft']).optional(),
   "featured": zod.boolean().optional()
 })
@@ -139,6 +184,7 @@ export const UpdateProjectResponse = zod.object({
   "tags": zod.array(zod.string()).optional(),
   "githubUrl": zod.string().nullish(),
   "liveUrl": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
   "techStack": zod.array(zod.string()).optional(),
   "visibility": zod.enum(['public', 'private', 'draft']),
   "featured": zod.boolean(),
@@ -477,6 +523,7 @@ export const GetHomepageDataResponse = zod.object({
   "tags": zod.array(zod.string()).optional(),
   "githubUrl": zod.string().nullish(),
   "liveUrl": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
   "techStack": zod.array(zod.string()).optional(),
   "visibility": zod.enum(['public', 'private', 'draft']),
   "featured": zod.boolean(),

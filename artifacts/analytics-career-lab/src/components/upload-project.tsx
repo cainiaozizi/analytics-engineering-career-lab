@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCreateProject, useFormatBody, getListProjectsQueryKey } from "@workspace/api-client-react";
+import { useUpload } from "@workspace/object-storage-web";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Markdown } from "@/components/markdown";
-import { Upload, FileText, CheckCircle2, Loader2, Wand2 } from "lucide-react";
+import { Upload, FileText, CheckCircle2, Loader2, Wand2, ImageIcon, X } from "lucide-react";
 import { TagPicker } from "@/components/tag-picker";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -23,13 +24,14 @@ interface ParsedProject {
   techStack: string;
   githubUrl: string;
   liveUrl: string;
+  imageUrl: string;
   visibility: "public" | "private" | "draft";
   featured: boolean;
 }
 
 const DEFAULTS: ParsedProject = {
   title: "", description: "", body: "", tags: [], techStack: "",
-  githubUrl: "", liveUrl: "", visibility: "draft", featured: false,
+  githubUrl: "", liveUrl: "", imageUrl: "", visibility: "draft", featured: false,
 };
 
 type FileFormat = "md" | "pdf" | "docx";
@@ -177,6 +179,29 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
     },
   });
 
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const { uploadFile, isUploading: isUploadingImage } = useUpload({
+    onSuccess: (response) => {
+      set("imageUrl", response.objectPath);
+    },
+  });
+
+  async function handleImageFile(file: File) {
+    if (!file.type.startsWith("image/")) return;
+    // Show local preview immediately
+    setImagePreview(URL.createObjectURL(file));
+    // Upload to object storage
+    await uploadFile(file);
+  }
+
+  function clearImage() {
+    set("imageUrl", "");
+    setImagePreview(null);
+    if (imageInputRef.current) imageInputRef.current.value = "";
+  }
+
   const { mutate: formatBody, isPending: isFormatting } = useFormatBody({
     mutation: {
       onSuccess: (result) => {
@@ -250,6 +275,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
         techStack: toArray(fields.techStack),
         githubUrl: fields.githubUrl || undefined,
         liveUrl: fields.liveUrl || undefined,
+        imageUrl: fields.imageUrl || undefined,
         visibility,
         featured: fields.featured,
       },
@@ -264,6 +290,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
       setFormat(null);
       setSubmitted(false);
       setParseError(null);
+      setImagePreview(null);
     }, 300);
   }
 
@@ -410,6 +437,50 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
                   <TagPicker
                     value={fields.tags}
                     onChange={tags => set("tags", tags)}
+                  />
+                </div>
+
+                {/* Image upload */}
+                <div className="space-y-1.5">
+                  <Label>Cover Image</Label>
+                  {imagePreview || fields.imageUrl ? (
+                    <div className="relative rounded-lg overflow-hidden border bg-muted aspect-video">
+                      <img
+                        src={imagePreview ?? `/api/storage${fields.imageUrl}`}
+                        alt="Cover preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={clearImage}
+                        className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full p-1 hover:bg-background transition-colors"
+                        aria-label="Remove image"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                      {isUploadingImage && (
+                        <div className="absolute inset-0 bg-background/60 flex items-center justify-center gap-2 text-sm">
+                          <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => imageInputRef.current?.click()}
+                      className="w-full border border-dashed rounded-lg p-6 flex flex-col items-center gap-2 text-sm text-muted-foreground hover:border-foreground/40 hover:text-foreground transition-colors"
+                    >
+                      <ImageIcon className="h-8 w-8 opacity-40" />
+                      <span>Click to attach a cover image</span>
+                      <span className="text-xs">PNG, JPG, WebP, GIF</span>
+                    </button>
+                  )}
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => { const f = e.target.files?.[0]; if (f) handleImageFile(f); }}
                   />
                 </div>
 

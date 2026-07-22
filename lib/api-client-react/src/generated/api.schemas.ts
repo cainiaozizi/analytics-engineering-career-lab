@@ -29,6 +29,8 @@ export interface Project {
   githubUrl?: string | null;
   /** @nullable */
   liveUrl?: string | null;
+  /** @nullable */
+  imageUrl?: string | null;
   techStack?: string[];
   visibility: Visibility;
   featured: boolean;
@@ -45,6 +47,7 @@ export interface ProjectInput {
   githubUrl?: string;
   liveUrl?: string;
   techStack?: string[];
+  imageUrl?: string;
   visibility?: Visibility;
   featured?: boolean;
 }
@@ -57,6 +60,7 @@ export interface ProjectUpdate {
   githubUrl?: string;
   liveUrl?: string;
   techStack?: string[];
+  imageUrl?: string;
   visibility?: Visibility;
   featured?: boolean;
 }
@@ -231,6 +235,20 @@ export interface FormatBodyInput {
 export interface FormatBodyResult {
   /** Reformatted Markdown body */
   body: string;
+}
+
+export interface UploadUrlRequest {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 1 */
+  size: number;
+  /** @minLength 1 */
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
 }
 
 export interface TopicSummary {

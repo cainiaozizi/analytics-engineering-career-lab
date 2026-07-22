@@ -41,7 +41,16 @@ export default function Projects() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects?.map((project) => (
             <Link key={project.id} href={`/projects/${project.id}`} className="group h-full block">
-              <Card className="h-full flex flex-col transition-all hover:border-primary/50 hover:shadow-md">
+              <Card className="h-full flex flex-col transition-all hover:border-primary/50 hover:shadow-md overflow-hidden">
+                {project.imageUrl && (
+                  <div className="aspect-video w-full overflow-hidden bg-muted">
+                    <img
+                      src={`/api/storage${project.imageUrl}`}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex justify-between items-start mb-2">
                     <CardTitle className="group-hover:text-primary transition-colors text-xl leading-tight">

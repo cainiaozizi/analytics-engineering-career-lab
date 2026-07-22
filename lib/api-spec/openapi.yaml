@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: ai
     description: AI utility operations
+  - name: Storage
+    description: Object storage upload and serving endpoints.
   - name: projects
     description: Portfolio projects
   - name: posts
@@ -24,6 +26,74 @@ tags:
     description: Homepage aggregated data
 
 paths:
+  # ── Storage ──────────────────────────────────────────────────────────────────
+  /storage/uploads/request-url:
+    post:
+      tags: [Storage]
+      operationId: requestUploadUrl
+      summary: Request a presigned URL for file upload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadUrlRequest'
+      responses:
+        '200':
+          description: Presigned upload URL generated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadUrlResponse'
+        '400':
+          description: Missing or invalid required fields.
+        '500':
+          description: Failed to generate upload URL.
+
+  /storage/public-objects/{filePath}:
+    get:
+      tags: [Storage]
+      operationId: getPublicObject
+      summary: Serve a public asset
+      parameters:
+        - name: filePath
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Object content streamed.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: File not found.
+
+  /storage/objects/{objectPath}:
+    get:
+      tags: [Storage]
+      operationId: getStorageObject
+      summary: Serve an uploaded object
+      parameters:
+        - name: objectPath
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Object content streamed.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Object not found.
+
   # ── AI Utilities ─────────────────────────────────────────────────────────────
   /ai/format-body:
     post:
@@ -558,6 +628,8 @@ components:
           type: ["string", "null"]
         liveUrl:
           type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
         techStack:
           type: array
           items:
@@ -596,6 +668,8 @@ components:
           type: array
           items:
             type: string
+        imageUrl:
+          type: string
         visibility:
           $ref: "#/components/schemas/Visibility"
         featured:
@@ -622,6 +696,8 @@ components:
           type: array
           items:
             type: string
+        imageUrl:
+          type: string
         visibility:
           $ref: "#/components/schemas/Visibility"
         featured:
@@ -888,6 +964,29 @@ components:
         body:
           type: string
           description: Reformatted Markdown body
+
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        size:
+          type: integer
+          minimum: 1
+        contentType:
+          type: string
+          minLength: 1
+
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL:
+          type: string
+        objectPath:
+          type: string
 
     TopicSummary:
       type: object

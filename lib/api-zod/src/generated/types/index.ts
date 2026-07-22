@@ -40,4 +40,6 @@ export * from './searchResults';
 export * from './searchResultType';
 export * from './stats';
 export * from './topicSummary';
+export * from './uploadUrlRequest';
+export * from './uploadUrlResponse';
 export * from './visibility';

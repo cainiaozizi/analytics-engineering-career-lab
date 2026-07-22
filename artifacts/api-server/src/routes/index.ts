@@ -6,6 +6,7 @@ import notesRouter from "./notes";
 import interviewRouter from "./interview";
 import homepageRouter from "./homepage";
 import { aiRouter } from "./ai";
+import storageRouter from "./storage";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(notesRouter);
 router.use(interviewRouter);
 router.use(homepageRouter);
 router.use("/ai", aiRouter);
+router.use(storageRouter);
 
 export default router;
