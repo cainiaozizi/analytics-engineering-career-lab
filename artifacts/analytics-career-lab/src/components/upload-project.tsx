@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Markdown } from "@/components/markdown";
 import { Upload, FileText, CheckCircle2, Loader2 } from "lucide-react";
+import { TagPicker } from "@/components/tag-picker";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -18,7 +19,7 @@ interface ParsedProject {
   title: string;
   description: string;
   body: string;
-  tags: string;
+  tags: string[];
   techStack: string;
   githubUrl: string;
   liveUrl: string;
@@ -27,7 +28,7 @@ interface ParsedProject {
 }
 
 const DEFAULTS: ParsedProject = {
-  title: "", description: "", body: "", tags: "", techStack: "",
+  title: "", description: "", body: "", tags: [], techStack: "",
   githubUrl: "", liveUrl: "", visibility: "draft", featured: false,
 };
 
@@ -69,7 +70,7 @@ function parseFrontmatter(raw: string): ParsedProject {
     switch (key) {
       case "title":       result.title = value; break;
       case "description": result.description = value; break;
-      case "tags":        result.tags = value; break;
+      case "tags":        result.tags = value.split(",").map(s => s.trim()).filter(Boolean); break;
       case "techStack":   result.techStack = value; break;
       case "githubUrl":   result.githubUrl = value; break;
       case "liveUrl":     result.liveUrl = value; break;
@@ -226,7 +227,7 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
         title: fields.title,
         description: fields.description,
         body: fields.body || undefined,
-        tags: toArray(fields.tags),
+        tags: fields.tags,
         techStack: toArray(fields.techStack),
         githubUrl: fields.githubUrl || undefined,
         liveUrl: fields.liveUrl || undefined,
@@ -387,8 +388,10 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
 
                 <div className="space-y-1.5">
                   <Label>Tags</Label>
-                  <Input value={fields.tags} onChange={e => set("tags", e.target.value)} placeholder="dbt, data-modeling, python" />
-                  <p className="text-xs text-muted-foreground">Comma-separated, lowercase</p>
+                  <TagPicker
+                    value={fields.tags}
+                    onChange={tags => set("tags", tags)}
+                  />
                 </div>
 
                 <div className="space-y-1.5">
