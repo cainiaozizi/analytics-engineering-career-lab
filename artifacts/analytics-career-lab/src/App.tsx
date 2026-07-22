@@ -11,8 +11,6 @@ import Blog from '@/pages/blog';
 import PostDetail from '@/pages/post-detail';
 import Notes from '@/pages/notes';
 import NoteDetail from '@/pages/note-detail';
-import InterviewPrep from '@/pages/interview-prep';
-import InterviewEntryDetail from '@/pages/interview-entry-detail';
 import About from '@/pages/about';
 import NotFound from '@/pages/not-found';
 
@@ -27,10 +25,8 @@ function Router() {
         <Route path="/projects/:id" component={ProjectDetail} />
         <Route path="/guides" component={Blog} />
         <Route path="/guides/:id" component={PostDetail} />
-        <Route path="/notes" component={Notes} />
-        <Route path="/notes/:id" component={NoteDetail} />
-        <Route path="/interview-prep" component={InterviewPrep} />
-        <Route path="/interview-prep/:id" component={InterviewEntryDetail} />
+        <Route path="/interview-prep" component={Notes} />
+        <Route path="/interview-prep/:id" component={NoteDetail} />
         <Route path="/about" component={About} />
         <Route component={NotFound} />
       </Switch>

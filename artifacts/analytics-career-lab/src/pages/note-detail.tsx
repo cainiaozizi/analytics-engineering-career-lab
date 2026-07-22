@@ -30,8 +30,8 @@ export default function NoteDetail() {
   if (!note) {
     return (
       <div className="max-w-2xl space-y-4">
-        <Link href="/notes" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Notes
+        <Link href="/interview-prep" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Interview Prep
         </Link>
         <div className="border border-dashed rounded-xl p-12 text-center space-y-2">
           <p className="text-lg font-medium">Note not found</p>
@@ -44,8 +44,8 @@ export default function NoteDetail() {
   return (
     <article className="max-w-2xl space-y-8">
       <div className="flex items-center justify-between">
-        <Link href="/notes" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Notes
+        <Link href="/interview-prep" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Interview Prep
         </Link>
         <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
           <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit

@@ -57,7 +57,7 @@ export default function Home() {
                 {searchResults?.results?.map((result) => (
                   <Link 
                     key={`${result.type}-${result.id}`} 
-                    href={result.type === 'project' ? `/projects/${result.id}` : result.type === 'post' ? `/guides/${result.id}` : result.type === 'note' ? `/notes/${result.id}` : `/interview-prep/${result.id}`}
+                    href={result.type === 'project' ? `/projects/${result.id}` : result.type === 'post' ? `/guides/${result.id}` : result.type === 'note' ? `/interview-prep/${result.id}` : `/interview-prep/${result.id}`}
                     className="flex flex-col p-4 border-b last:border-0 hover:bg-accent/50 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -162,13 +162,13 @@ export default function Home() {
               <section className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold tracking-tight">Recent Notes</h2>
-                  <Link href="/notes" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
+                  <Link href="/interview-prep" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
                     All notes <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
                 <div className="space-y-4">
                   {home.recentNotes.map(note => (
-                    <Link key={note.id} href={`/notes/${note.id}`} className="group block">
+                    <Link key={note.id} href={`/interview-prep/${note.id}`} className="group block">
                       <div className="p-4 rounded-xl border border-transparent hover:border-border hover:bg-card transition-all flex items-start gap-4">
                         <div className="bg-muted p-2 rounded-lg group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                           <Bookmark className="w-4 h-4" />
