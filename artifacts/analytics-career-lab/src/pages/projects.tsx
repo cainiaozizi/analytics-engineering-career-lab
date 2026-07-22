@@ -1,20 +1,31 @@
+import { useState } from "react";
 import { useListProjects } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Github, ExternalLink, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { UploadProject } from "@/components/upload-project";
+import { Github, ExternalLink, Calendar, Upload } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default function Projects() {
   const { data: projects, isLoading } = useListProjects();
+  const [uploadOpen, setUploadOpen] = useState(false);
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-        <p className="text-muted-foreground mt-2">Data pipelines, dashboards, and engineering experiments.</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
+          <p className="text-muted-foreground mt-2">Data pipelines, dashboards, and engineering experiments.</p>
+        </div>
+        <Button variant="outline" className="shrink-0" onClick={() => setUploadOpen(true)}>
+          <Upload className="w-4 h-4 mr-2" /> Upload .md
+        </Button>
       </div>
+
+      <UploadProject open={uploadOpen} onOpenChange={setUploadOpen} />
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
