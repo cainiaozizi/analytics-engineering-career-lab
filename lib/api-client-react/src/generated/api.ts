@@ -20,6 +20,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  FormatBodyInput,
+  FormatBodyResult,
   HealthStatus,
   HomepageData,
   InterviewEntry,
@@ -70,6 +72,77 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getFormatBodyUrl = () => {
+
+
+
+
+  return `/api/ai/format-body`
+}
+
+/**
+ * @summary Clean and reformat raw body text into well-structured Markdown
+ */
+export const formatBody = async (formatBodyInput: FormatBodyInput, options?: RequestInit): Promise<FormatBodyResult> => {
+
+  return customFetch<FormatBodyResult>(getFormatBodyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(formatBodyInput)
+  }
+);}
+
+
+
+
+
+export const getFormatBodyMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof formatBody>>, TError,{data: BodyType<FormatBodyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof formatBody>>, TError,{data: BodyType<FormatBodyInput>}, TContext> => {
+
+const mutationKey = ['formatBody'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof formatBody>>, {data: BodyType<FormatBodyInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  formatBody(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FormatBodyMutationResult = NonNullable<Awaited<ReturnType<typeof formatBody>>>
+    export type FormatBodyMutationBody = BodyType<FormatBodyInput>
+    export type FormatBodyMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Clean and reformat raw body text into well-structured Markdown
+ */
+export const useFormatBody = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof formatBody>>, TError,{data: BodyType<FormatBodyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof formatBody>>,
+        TError,
+        {data: BodyType<FormatBodyInput>},
+        TContext
+      > => {
+      return useMutation(getFormatBodyMutationOptions(options));
+    }
 
 export const getHealthCheckUrl = () => {
 

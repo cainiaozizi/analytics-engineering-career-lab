@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCreateProject, getListProjectsQueryKey } from "@workspace/api-client-react";
+import { useCreateProject, useFormatBody, getListProjectsQueryKey } from "@workspace/api-client-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Markdown } from "@/components/markdown";
-import { Upload, FileText, CheckCircle2, Loader2 } from "lucide-react";
+import { Upload, FileText, CheckCircle2, Loader2, Wand2 } from "lucide-react";
 import { TagPicker } from "@/components/tag-picker";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -176,6 +176,25 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
       },
     },
   });
+
+  const { mutate: formatBody, isPending: isFormatting } = useFormatBody({
+    mutation: {
+      onSuccess: (result) => {
+        set("body", result.body);
+      },
+    },
+  });
+
+  function handleFixFormat() {
+    if (!fields?.body) return;
+    formatBody({
+      data: {
+        body: fields.body,
+        title: fields.title || undefined,
+        context: "project",
+      },
+    });
+  }
 
   async function handleFile(file: File) {
     const fmt = detectFormat(file.name);
@@ -405,7 +424,20 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Body</Label>
+                  <div className="flex items-center justify-between">
+                    <Label>Body</Label>
+                    <button
+                      type="button"
+                      onClick={handleFixFormat}
+                      disabled={isFormatting || !fields.body}
+                      className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {isFormatting
+                        ? <><Loader2 className="h-3 w-3 animate-spin" /> Fixing…</>
+                        : <><Wand2 className="h-3 w-3" /> Fix format</>
+                      }
+                    </button>
+                  </div>
                   <Textarea
                     value={fields.body}
                     onChange={e => set("body", e.target.value)}
@@ -413,6 +445,9 @@ export function UploadProject({ open, onOpenChange }: UploadProjectProps) {
                     rows={10}
                     className="font-mono text-sm"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    "Fix format" uses AI to clean up messy PDF/DOCX extraction into structured Markdown.
+                  </p>
                 </div>
               </TabsContent>
 

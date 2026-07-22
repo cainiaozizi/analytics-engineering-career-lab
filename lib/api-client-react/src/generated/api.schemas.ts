@@ -207,6 +207,32 @@ export interface SearchResults {
   total: number;
 }
 
+/**
+ * Content type context
+ */
+export type FormatBodyInputContext = typeof FormatBodyInputContext[keyof typeof FormatBodyInputContext];
+
+
+export const FormatBodyInputContext = {
+  project: 'project',
+  post: 'post',
+  note: 'note',
+} as const;
+
+export interface FormatBodyInput {
+  /** Raw body text to reformat */
+  body: string;
+  /** Optional title hint for context */
+  title?: string;
+  /** Content type context */
+  context?: FormatBodyInputContext;
+}
+
+export interface FormatBodyResult {
+  /** Reformatted Markdown body */
+  body: string;
+}
+
 export interface TopicSummary {
   topic: string;
   count: number;

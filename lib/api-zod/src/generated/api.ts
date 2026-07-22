@@ -9,6 +9,20 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary Clean and reformat raw body text into well-structured Markdown
+ */
+export const FormatBodyBody = zod.object({
+  "body": zod.string().describe('Raw body text to reformat'),
+  "title": zod.string().optional().describe('Optional title hint for context'),
+  "context": zod.enum(['project', 'post', 'note']).optional().describe('Content type context')
+})
+
+export const FormatBodyResponse = zod.object({
+  "body": zod.string().describe('Reformatted Markdown body')
+})
+
+
+/**
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
