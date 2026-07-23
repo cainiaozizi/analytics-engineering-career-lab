@@ -43,15 +43,13 @@ export default function InterviewPrep() {
       <header className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">Interview Prep</h1>
-          <p className="text-lg text-muted-foreground">Resources you've curated to help yourself and others.</p>
+          <p className="text-lg text-muted-foreground">Resources I have curated to help myself and others.</p>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="shrink-0">
           <Plus className="w-4 h-4 mr-1.5" /> New note
         </Button>
       </header>
-
       <CreateNote open={createOpen} onOpenChange={setCreateOpen} />
-
       {!isLoading && availableTags.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
@@ -93,7 +91,6 @@ export default function InterviewPrep() {
           )}
         </div>
       )}
-
       {isLoading ? (
         <div className="space-y-4">
           {Array.from({length: 5}).map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}
