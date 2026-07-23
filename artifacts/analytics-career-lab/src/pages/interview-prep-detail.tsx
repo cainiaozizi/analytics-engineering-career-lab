@@ -36,7 +36,7 @@ export default function NoteDetail() {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListNotesQueryKey() });
-        navigate("/notes");
+        navigate("/interview-prep");
       },
     },
   });
