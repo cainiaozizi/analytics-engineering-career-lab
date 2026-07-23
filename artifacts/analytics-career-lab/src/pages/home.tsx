@@ -25,12 +25,11 @@ export default function Home() {
     <div className="space-y-12">
       {/* Intro */}
       <section className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">Analytics Engineering Career Lab</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Data Analytics Engineering Lab</h1>
         <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
           A working knowledge hub and public portfolio. Where engineering rigor meets intellectual curiosity.
         </p>
       </section>
-
       {/* Search */}
       <section className="relative z-10 max-w-2xl">
         <div className="relative">
@@ -72,7 +71,6 @@ export default function Home() {
           </div>
         )}
       </section>
-
       {/* Stats Bar */}
       <section>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -88,7 +86,6 @@ export default function Home() {
           ) : null}
         </div>
       </section>
-
       {/* Content Grids */}
       {homeLoading ? (
         <div className="space-y-8">
