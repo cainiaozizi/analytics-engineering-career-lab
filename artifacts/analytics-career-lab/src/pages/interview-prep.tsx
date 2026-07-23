@@ -3,21 +3,15 @@ import { useListNotes } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { CreateNote } from "@/components/create-note";
 import { formatDate } from "@/lib/utils";
-import { Hash, Plus } from "lucide-react";
+import { Hash, Plus, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function InterviewPrep() {
   const { data: notes, isLoading } = useListNotes();
   const [createOpen, setCreateOpen] = useState(false);
-  const [tagFilter, setTagFilter] = useState<string>("all");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   // Collect unique tags from notes that actually exist, in alphabetical order
   const availableTags = useMemo(() => {
@@ -31,9 +25,18 @@ export default function InterviewPrep() {
 
   const filteredNotes = useMemo(() => {
     if (!notes) return [];
-    if (tagFilter === "all") return notes;
-    return notes.filter((note) => note.tags?.includes(tagFilter));
-  }, [notes, tagFilter]);
+    if (selectedTags.length === 0) return notes;
+    // Show notes that contain ALL of the selected tags (AND narrowing)
+    return notes.filter((note) =>
+      selectedTags.every((tag) => note.tags?.includes(tag))
+    );
+  }, [notes, selectedTags]);
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
 
   return (
     <div className="space-y-8 max-w-3xl">
@@ -50,25 +53,43 @@ export default function InterviewPrep() {
       <CreateNote open={createOpen} onOpenChange={setCreateOpen} />
 
       {!isLoading && availableTags.length > 0 && (
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">Filter by tag:</span>
-          <Select value={tagFilter} onValueChange={setTagFilter}>
-            <SelectTrigger className="w-56">
-              <SelectValue placeholder="All tags" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All tags</SelectItem>
-              {availableTags.map((tag) => (
-                <SelectItem key={tag} value={tag}>
-                  {tag}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {tagFilter !== "all" && (
-            <span className="text-xs text-muted-foreground">
-              {filteredNotes.length} {filteredNotes.length === 1 ? "note" : "notes"}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-sm text-muted-foreground">
+              Filter by tag{selectedTags.length > 0 && " (narrowing)"}
             </span>
+            {selectedTags.length > 0 && (
+              <button
+                onClick={() => setSelectedTags([])}
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="w-3 h-3" /> Clear
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {availableTags.map((tag) => {
+              const isActive = selectedTags.includes(tag);
+              return (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={cn(
+                    "inline-flex items-center gap-1 text-xs uppercase font-semibold px-2 py-1 rounded-md transition-colors",
+                    isActive
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "text-muted-foreground bg-accent hover:bg-accent/70"
+                  )}
+                >
+                  <Hash className="w-3 h-3" /> {tag}
+                </button>
+              );
+            })}
+          </div>
+          {selectedTags.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {filteredNotes.length} {filteredNotes.length === 1 ? "note matches" : "notes match"} your selection
+            </p>
           )}
         </div>
       )}
@@ -79,8 +100,8 @@ export default function InterviewPrep() {
         </div>
       ) : filteredNotes.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground border rounded-xl border-dashed">
-          {tagFilter !== "all"
-            ? `No notes tagged with "${tagFilter}".`
+          {selectedTags.length > 0
+            ? "No notes match the selected tags."
             : "No notes found."}
         </div>
       ) : (
