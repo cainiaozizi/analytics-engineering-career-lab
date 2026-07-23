@@ -1,22 +1,46 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useListNotes } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CreateNote } from "@/components/create-note";
 import { formatDate } from "@/lib/utils";
 import { Hash, Plus } from "lucide-react";
 
-export default function Notes() {
+export default function InterviewPrep() {
   const { data: notes, isLoading } = useListNotes();
   const [createOpen, setCreateOpen] = useState(false);
+  const [tagFilter, setTagFilter] = useState<string>("all");
+
+  // Collect unique tags from notes that actually exist, in alphabetical order
+  const availableTags = useMemo(() => {
+    if (!notes) return [];
+    const set = new Set<string>();
+    notes.forEach((note) => {
+      note.tags?.forEach((tag) => set.add(tag));
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [notes]);
+
+  const filteredNotes = useMemo(() => {
+    if (!notes) return [];
+    if (tagFilter === "all") return notes;
+    return notes.filter((note) => note.tags?.includes(tagFilter));
+  }, [notes, tagFilter]);
 
   return (
     <div className="space-y-8 max-w-3xl">
       <header className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">Engineering Notes</h1>
-          <p className="text-lg text-muted-foreground">Short snippets, reference materials, and half-baked ideas.</p>
+          <h1 className="text-3xl font-bold tracking-tight">Interview Prep</h1>
+          <p className="text-lg text-muted-foreground">Resources you've curated to help yourself and others.</p>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="shrink-0">
           <Plus className="w-4 h-4 mr-1.5" /> New note
@@ -25,26 +49,52 @@ export default function Notes() {
 
       <CreateNote open={createOpen} onOpenChange={setCreateOpen} />
 
+      {!isLoading && availableTags.length > 0 && (
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-muted-foreground">Filter by tag:</span>
+          <Select value={tagFilter} onValueChange={setTagFilter}>
+            <SelectTrigger className="w-56">
+              <SelectValue placeholder="All tags" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All tags</SelectItem>
+              {availableTags.map((tag) => (
+                <SelectItem key={tag} value={tag}>
+                  {tag}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {tagFilter !== "all" && (
+            <span className="text-xs text-muted-foreground">
+              {filteredNotes.length} {filteredNotes.length === 1 ? "note" : "notes"}
+            </span>
+          )}
+        </div>
+      )}
+
       {isLoading ? (
         <div className="space-y-4">
           {Array.from({length: 5}).map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}
         </div>
-      ) : notes?.length === 0 ? (
+      ) : filteredNotes.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground border rounded-xl border-dashed">
-          No notes found.
+          {tagFilter !== "all"
+            ? `No notes tagged with "${tagFilter}".`
+            : "No notes found."}
         </div>
       ) : (
         <div className="flex flex-col border rounded-xl overflow-hidden bg-card">
-          {notes?.map((note) => (
-            <Link 
-              key={note.id} 
-              href={`/notes/${note.id}`} 
+          {filteredNotes.map((note) => (
+            <Link
+              key={note.id}
+              href={`/interview-prep/${note.id}`}
               className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 p-4 border-b last:border-0 hover:bg-muted/50 transition-colors group"
             >
               <div className="flex-shrink-0 flex flex-row sm:flex-col justify-between sm:justify-start sm:w-28 gap-1">
                 <span className="text-xs text-muted-foreground tabular-nums">{formatDate(note.createdAt)}</span>
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <h3 className="text-base font-medium group-hover:text-primary transition-colors truncate">
                   {note.title}
