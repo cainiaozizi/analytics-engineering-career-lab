@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useListNotes } from "@workspace/api-client-react";
+import { useAuth } from "@/context/auth";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ export default function InterviewPrep() {
   const { data: notes, isLoading } = useListNotes();
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const { isOwner } = useAuth();
 
   // Collect unique tags from notes that actually exist, in alphabetical order
   const availableTags = useMemo(() => {
@@ -45,11 +47,13 @@ export default function InterviewPrep() {
           <h1 className="text-3xl font-bold tracking-tight">Interview Prep</h1>
           <p className="text-lg text-muted-foreground">Resources I have curated to help myself and others.</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="shrink-0">
-          <Plus className="w-4 h-4 mr-1.5" /> New note
-        </Button>
+        {isOwner && (
+          <Button onClick={() => setCreateOpen(true)} className="shrink-0">
+            <Plus className="w-4 h-4 mr-1.5" /> New note
+          </Button>
+        )}
       </header>
-      <CreateNote open={createOpen} onOpenChange={setCreateOpen} />
+      {isOwner && <CreateNote open={createOpen} onOpenChange={setCreateOpen} />}
       {!isLoading && availableTags.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">

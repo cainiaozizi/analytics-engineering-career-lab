@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/context/auth";
 import {
   useCreateNote, useFormatBody,
   getListNotesQueryKey,
@@ -29,7 +30,10 @@ const defaultFields = {
 };
 
 export function CreateNote({ open, onOpenChange, onCreated }: CreateNoteProps) {
+  const { isOwner } = useAuth();
   const [fields, setFields] = useState({ ...defaultFields });
+
+  if (!isOwner) return null;
 
   const queryClient = useQueryClient();
 

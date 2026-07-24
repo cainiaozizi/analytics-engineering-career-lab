@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useGetNote, useDeleteNote, getGetNoteQueryKey, getListNotesQueryKey } from "@workspace/api-client-react";
+import { useAuth } from "@/context/auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ export default function NoteDetail() {
   const id = parseInt(params.id || "0", 10);
   const [, navigate] = useLocation();
   const [editOpen, setEditOpen] = useState(false);
+  const { isOwner } = useAuth();
 
   const queryClient = useQueryClient();
   
@@ -71,40 +73,42 @@ export default function NoteDetail() {
         <Link href="/interview-prep" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Interview Prep
         </Link>
-        <div className="flex items-center gap-2">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" disabled={isDeleting}>
-                {isDeleting
-                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  : <Trash2 className="w-3.5 h-3.5" />}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete note?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete "{note.title}". This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  onClick={() => deleteNote({ id })}
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
-            <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
-          </Button>
-        </div>
+        {isOwner && (
+          <div className="flex items-center gap-2">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" disabled={isDeleting}>
+                  {isDeleting
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    : <Trash2 className="w-3.5 h-3.5" />}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete note?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete "{note.title}". This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() => deleteNote({ id })}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
+            </Button>
+          </div>
+        )}
       </div>
 
-      <EditNote note={note} open={editOpen} onOpenChange={setEditOpen} />
+      {isOwner && <EditNote note={note} open={editOpen} onOpenChange={setEditOpen} />}
 
       <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
         <header className="p-6 border-b bg-muted/20">

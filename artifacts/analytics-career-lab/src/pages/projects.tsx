@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useListProjects } from "@workspace/api-client-react";
 import { Link } from "wouter";
+import { useAuth } from "@/context/auth";
 import {
   Card,
   CardContent,
@@ -18,6 +19,7 @@ import { formatDate } from "@/lib/utils";
 export default function Projects() {
   const { data: projects, isLoading } = useListProjects();
   const [uploadOpen, setUploadOpen] = useState(false);
+  const { isOwner } = useAuth();
 
   return (
     <div className="space-y-8">
@@ -26,16 +28,18 @@ export default function Projects() {
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
           <p className="text-lg text-muted-foreground">What I built.</p>
         </div>
-        <Button
-          variant="outline"
-          className="shrink-0"
-          onClick={() => setUploadOpen(true)}
-        >
-          <Upload className="w-4 h-4 mr-2" /> Upload
-        </Button>
+        {isOwner && (
+          <Button
+            variant="outline"
+            className="shrink-0"
+            onClick={() => setUploadOpen(true)}
+          >
+            <Upload className="w-4 h-4 mr-2" /> Upload
+          </Button>
+        )}
       </div>
 
-      <UploadProject open={uploadOpen} onOpenChange={setUploadOpen} />
+      {isOwner && <UploadProject open={uploadOpen} onOpenChange={setUploadOpen} />}
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

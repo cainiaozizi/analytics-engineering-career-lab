@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/context/auth";
 import {
   useCreatePost, useFormatBody,
   getListPostsQueryKey,
@@ -32,7 +33,10 @@ const defaultFields = {
 };
 
 export function CreatePost({ open, onOpenChange, onCreated }: CreatePostProps) {
+  const { isOwner } = useAuth();
   const [fields, setFields] = useState({ ...defaultFields });
+
+  if (!isOwner) return null;
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageName, setImageName] = useState("");
   const [imageObjectPath, setImageObjectPath] = useState("");

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/context/auth";
 import {
   useUpdatePost, useFormatBody,
   getListPostsQueryKey, getGetPostQueryKey,
@@ -32,7 +33,10 @@ interface EditPostProps {
 }
 
 export function EditPost({ post, open, onOpenChange }: EditPostProps) {
+  const { isOwner } = useAuth();
   const [fields, setFields] = useState({ ...post, tags: post.tags ?? [] });
+
+  if (!isOwner) return null;
   const [saved, setSaved] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageName, setImageName] = useState("");

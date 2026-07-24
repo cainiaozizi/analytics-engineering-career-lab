@@ -1,9 +1,10 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, FileText, PenTool, MessageSquare, User, Search, Menu } from "lucide-react";
+import { LayoutDashboard, FileText, PenTool, MessageSquare, User, Menu, LogIn, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import { useAuth } from "@/context/auth";
 
 const navItems = [
   { name: "Home", path: "/", icon: LayoutDashboard },
@@ -15,6 +16,12 @@ const navItems = [
 
 export function Sidebar() {
   const [location] = useLocation();
+  const { isOwner } = useAuth();
+
+  async function handleSignOut() {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    window.location.reload();
+  }
 
   return (
     <aside className="fixed inset-y-0 left-0 z-20 w-64 border-r bg-sidebar hidden flex-col lg:flex">
@@ -38,10 +45,27 @@ export function Sidebar() {
         })}
       </nav>
       <div className="border-t p-4">
-        <div className="text-xs text-muted-foreground flex items-center gap-2 px-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-          Analytics Engineer
-        </div>
+        {isOwner ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+            onClick={handleSignOut}
+          >
+            <LogOut className="h-4 w-4" />
+            Sign out
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+            onClick={() => { window.location.href = "/api/auth/google"; }}
+          >
+            <LogIn className="h-4 w-4" />
+            Sign in
+          </Button>
+        )}
       </div>
     </aside>
   );
@@ -50,6 +74,12 @@ export function Sidebar() {
 export function MobileNav() {
   const [location, setLocation] = useLocation();
   const [open, setOpen] = useState(false);
+  const { isOwner } = useAuth();
+
+  async function handleSignOut() {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    window.location.reload();
+  }
 
   return (
     <div className="flex h-14 items-center border-b bg-background px-4 lg:hidden">
@@ -60,7 +90,7 @@ export function MobileNav() {
             <span className="sr-only">Toggle Menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" className="w-64 p-0 flex flex-col">
           <div className="flex h-14 items-center border-b px-6">
             <span className="font-semibold tracking-tight">Career Lab</span>
           </div>
@@ -84,6 +114,29 @@ export function MobileNav() {
               );
             })}
           </nav>
+          <div className="border-t p-4">
+            {isOwner ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                onClick={handleSignOut}
+              >
+                <LogOut className="h-4 w-4" />
+                Sign out
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                onClick={() => { window.location.href = "/api/auth/google"; }}
+              >
+                <LogIn className="h-4 w-4" />
+                Sign in
+              </Button>
+            )}
+          </div>
         </SheetContent>
       </Sheet>
       <span className="font-semibold ml-2">Career Lab</span>

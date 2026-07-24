@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/context/auth";
 import { useCreateProject, useUpdateProject, useFormatBody, getListProjectsQueryKey, getGetProjectQueryKey } from "@workspace/api-client-react";
 import { useUpload } from "@workspace/object-storage-web";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -175,7 +176,10 @@ interface UploadProjectProps {
 }
 
 export function UploadProject({ open, onOpenChange, initialData }: UploadProjectProps) {
+  const { isOwner } = useAuth();
   const isEditMode = !!initialData;
+
+  if (!isOwner) return null;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
   const [format, setFormat] = useState<FileFormat | null>(null);

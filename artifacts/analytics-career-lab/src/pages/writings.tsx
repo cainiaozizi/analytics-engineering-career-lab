@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useListPosts } from "@workspace/api-client-react";
+import { useAuth } from "@/context/auth";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, Clock, PenLine } from "lucide-react";
@@ -11,6 +12,7 @@ import { CreatePost } from "@/components/create-post";
 export default function Blog() {
   const { data: posts, isLoading } = useListPosts();
   const [createOpen, setCreateOpen] = useState(false);
+  const { isOwner } = useAuth();
 
   return (
     <div className="space-y-10 max-w-3xl">
@@ -20,12 +22,14 @@ export default function Blog() {
             <h1 className="text-3xl font-bold tracking-tight">Writings</h1>
             <p className="text-lg text-muted-foreground">What I know.</p>
           </div>
-          <Button size="sm" onClick={() => setCreateOpen(true)} className="shrink-0 mt-1">
-            <PenLine className="w-3.5 h-3.5 mr-1.5" /> New post
-          </Button>
+          {isOwner && (
+            <Button size="sm" onClick={() => setCreateOpen(true)} className="shrink-0 mt-1">
+              <PenLine className="w-3.5 h-3.5 mr-1.5" /> New post
+            </Button>
+          )}
         </div>
       </header>
-      <CreatePost open={createOpen} onOpenChange={setCreateOpen} />
+      {isOwner && <CreatePost open={createOpen} onOpenChange={setCreateOpen} />}
       {isLoading ? (
         <div className="space-y-8">
           <Skeleton className="h-32 w-full" />

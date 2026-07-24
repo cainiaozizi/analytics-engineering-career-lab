@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useGetPost, useDeletePost, getGetPostQueryKey, getListPostsQueryKey } from "@workspace/api-client-react";
+import { useAuth } from "@/context/auth";
 import { Link, useParams, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,7 @@ export default function PostDetail() {
   const id = parseInt(params.id || "0", 10);
   const [, navigate] = useLocation();
   const [editOpen, setEditOpen] = useState(false);
+  const { isOwner } = useAuth();
 
   const queryClient = useQueryClient();
 
@@ -69,39 +71,41 @@ export default function PostDetail() {
         <Link href="/writings" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Writings
         </Link>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
-            <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
-                <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete post?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete "{post.title}". This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => deletePost({ id })}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Deleting…</> : "Delete"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
+        {isOwner && (
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
+                  <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete post?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete "{post.title}". This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => deletePost({ id })}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Deleting…</> : "Delete"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
       </div>
 
-      <EditPost post={post} open={editOpen} onOpenChange={setEditOpen} />
+      {isOwner && <EditPost post={post} open={editOpen} onOpenChange={setEditOpen} />}
 
       <header className="space-y-6">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">{post.title}</h1>

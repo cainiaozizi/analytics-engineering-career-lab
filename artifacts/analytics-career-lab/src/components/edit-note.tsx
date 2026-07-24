@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/context/auth";
 import {
   useUpdateNote, useFormatBody,
   getListNotesQueryKey, getGetNoteQueryKey,
@@ -30,9 +31,12 @@ interface EditNoteProps {
 }
 
 export function EditNote({ note, open, onOpenChange }: EditNoteProps) {
+  const { isOwner } = useAuth();
   const [fields, setFields] = useState({ ...note, tags: note.tags ?? [] });
   const [saved, setSaved] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  if (!isOwner) return null;
 
   useEffect(() => { setFields({ ...note, tags: note.tags ?? [] }); }, [note]);
 
