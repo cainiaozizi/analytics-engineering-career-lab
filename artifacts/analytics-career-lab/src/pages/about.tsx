@@ -9,10 +9,10 @@ export default function About() {
           alt="Zi Liu"
           className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover ring-2 ring-primary/15 shadow-sm shrink-0"
         />
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">About Me</h1>
-          <p className="text-xl text-muted-foreground leading-relaxed font-semibold">
-            Passionate about turning messy business problems into reliable data products and decisions.
+        <div className="space-y-1.5">
+          <h1 className="text-4xl font-bold tracking-tight">Zi Liu</h1>
+          <p className="text-base text-muted-foreground font-medium">
+            Data Analytics &amp; Engineering | SaaS | Finance
           </p>
         </div>
       </header>
