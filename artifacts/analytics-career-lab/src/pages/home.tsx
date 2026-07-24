@@ -141,7 +141,7 @@ export default function Home() {
             {home.featuredKnowledge.length > 0 && (
               <section className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold tracking-tight">Guides</h2>
+                  <h2 className="text-2xl font-semibold tracking-tight">Writings</h2>
                   <Link href="/guides" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
                     All guides <ArrowRight className="w-4 h-4" />
                   </Link>
