@@ -23,23 +23,27 @@ export default function About() {
       </div>
       <section className="space-y-6 pt-8 border-t">
         <h2 className="text-xl font-semibold tracking-tight text-foreground">Core Competencies</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-muted-foreground">
-          <ul className="space-y-2">
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Business &amp; Analytics</li>
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Financial &amp; Revenue Analytics</li>
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Product &amp; Usage Analytics</li>
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Metric Design &amp; Semantic Layers</li>
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Cost Attribution &amp; Optimization</li>
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Data Governance</li>
-          </ul>
-          <ul className="space-y-2">
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Analytics Engineering &amp; AI</li>
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> SQL &amp; Python</li>
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> dbt, Snowflake &amp; BigQuery</li>
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Data Modeling &amp; Data Pipelines</li>
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Git, Testing &amp; CI/CD</li>
-            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> AI-Assisted &amp; Agentic Analytics Workflows</li>
-          </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-3">
+            <h3 className="font-medium text-foreground">Data Analytics</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Financial &amp; Revenue Analytics</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Product &amp; Usage Analytics</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Metric Design &amp; Semantic Layers</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Cost Attribution &amp; Optimization</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Data Governance</li>
+            </ul>
+          </div>
+          <div className="space-y-3">
+            <h3 className="font-medium text-foreground">Analytics Engineering &amp; AI</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> SQL &amp; Python</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> dbt, Snowflake &amp; BigQuery</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Data Modeling &amp; Data Pipelines</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Git, Testing &amp; CI/CD</li>
+              <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> AI-Assisted &amp; Agentic Analytics Workflows</li>
+            </ul>
+          </div>
         </div>
       </section>
       <section className="space-y-6 pt-8 border-t">
