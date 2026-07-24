@@ -31,7 +31,8 @@ export default function Home() {
     <div className="space-y-10">
       {/* Intro */}
       <section className="space-y-3">
-        <h1 className="text-4xl font-bold tracking-tight">Analytics Engineering Career Lab</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Zi's Analytics Engineering Lab
+</h1>
         <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
           A working knowledge base and public portfolio — where I document what I build, what I know, and what I'm learning.
         </p>
@@ -39,7 +40,6 @@ export default function Home() {
           About me <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </section>
-
       {/* Search */}
       <section className="relative z-10 max-w-2xl">
         <div className="relative">
@@ -63,31 +63,39 @@ export default function Home() {
               <div className="p-4 text-center text-muted-foreground">No results found for "{debouncedSearch}"</div>
             ) : (
               <div className="flex flex-col">
-                {searchResults?.results?.map((result) => (
-                  <Link 
-                    key={`${result.type}-${result.id}`} 
-                    href={
-                      result.type === 'project' ? `/projects/${result.id}` :
-                      result.type === 'post' ? `/guides/${result.id}` :
-                      `/interview-prep/${result.id}`
-                    }
-                    className="flex flex-col p-4 border-b last:border-0 hover:bg-accent/50 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium">{result.title}</span>
-                      <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
-                        {TYPE_LABELS[result.type] ?? result.type}
-                      </Badge>
+                {searchResults?.results?.map((result) => {
+                  const itemHref =
+                    result.type === 'project' ? `/projects/${result.id}` :
+                    result.type === 'post' ? `/guides/${result.id}` :
+                    `/interview-prep/${result.id}`;
+                  const sectionHref =
+                    result.type === 'project' ? '/projects' :
+                    result.type === 'post' ? '/guides' :
+                    '/interview-prep';
+                  return (
+                    <div
+                      key={`${result.type}-${result.id}`}
+                      className="flex flex-col p-4 border-b last:border-0 hover:bg-accent/50 transition-colors"
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <Link href={itemHref} className="font-medium hover:text-primary transition-colors">
+                          {result.title}
+                        </Link>
+                        <Link href={sectionHref}>
+                          <Badge variant="outline" className="text-[10px] uppercase tracking-wider hover:border-primary hover:text-primary transition-colors cursor-pointer">
+                            {TYPE_LABELS[result.type] ?? result.type}
+                          </Badge>
+                        </Link>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-1">{result.excerpt}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground line-clamp-1">{result.excerpt}</p>
-                  </Link>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
         )}
       </section>
-
       {/* Stats Bar */}
       <section>
         <div className="grid grid-cols-3 gap-4">
@@ -102,7 +110,6 @@ export default function Home() {
           ) : null}
         </div>
       </section>
-
       {/* Content Grids */}
       {homeLoading ? (
         <div className="space-y-8">
