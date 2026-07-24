@@ -81,10 +81,12 @@ export default function Home() {
                         <Link href={itemHref} className="font-medium hover:text-primary transition-colors">
                           {result.title}
                         </Link>
-                        <Link href={sectionHref}>
-                          <Badge variant="outline" className="text-[10px] uppercase tracking-wider hover:border-primary hover:text-primary transition-colors cursor-pointer">
-                            {TYPE_LABELS[result.type] ?? result.type}
-                          </Badge>
+                        <Link
+                          href={sectionHref}
+                          className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground hover:border-primary hover:text-primary transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {TYPE_LABELS[result.type] ?? result.type}
                         </Link>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-1">{result.excerpt}</p>
