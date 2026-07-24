@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, ArrowRight, Folder, FileText, MessageSquare } from "lucide-react";
+import { Search, ArrowRight, Folder, FileText } from "lucide-react";
 import { useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { formatDate } from "@/lib/utils";
@@ -97,14 +97,13 @@ export default function Home() {
       </section>
       {/* Stats Bar */}
       <section>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {statsLoading ? (
             Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)
           ) : stats ? (
             <>
-              <StatCard icon={Folder}      label="Projects"       value={stats.publicProjects} />
-              <StatCard icon={FileText}    label="Guides"         value={stats.publicPosts} />
-              <StatCard icon={MessageSquare} label="Interview Prep" value={stats.totalNotes} />
+              <StatCard icon={Folder}   label="Projects" value={stats.publicProjects} />
+              <StatCard icon={FileText} label="Guides"   value={stats.publicPosts} />
             </>
           ) : null}
         </div>
