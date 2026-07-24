@@ -45,16 +45,9 @@ export default function InterviewPrep() {
           <h1 className="text-3xl font-bold tracking-tight">Interview Prep</h1>
           <p className="text-lg text-muted-foreground">Resources I have curated to help myself and others.</p>
         </div>
-        <div className="flex items-start gap-3 shrink-0">
-          <img
-            src={`${import.meta.env.BASE_URL}img-interview.jpg`}
-            alt=""
-            className="hidden md:block w-36 h-24 object-cover rounded-xl shadow-sm opacity-90"
-          />
-          <Button onClick={() => setCreateOpen(true)} className="shrink-0">
-            <Plus className="w-4 h-4 mr-1.5" /> New note
-          </Button>
-        </div>
+        <Button onClick={() => setCreateOpen(true)} className="shrink-0">
+          <Plus className="w-4 h-4 mr-1.5" /> New note
+        </Button>
       </header>
       <CreateNote open={createOpen} onOpenChange={setCreateOpen} />
       {!isLoading && availableTags.length > 0 && (

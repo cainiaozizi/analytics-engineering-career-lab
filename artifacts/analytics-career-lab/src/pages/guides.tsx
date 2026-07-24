@@ -20,16 +20,9 @@ export default function Blog() {
             <h1 className="text-3xl font-bold tracking-tight">Guides</h1>
             <p className="text-lg text-muted-foreground">What I know.</p>
           </div>
-          <div className="flex items-start gap-3 shrink-0">
-            <img
-              src={`${import.meta.env.BASE_URL}img-guides.jpg`}
-              alt=""
-              className="hidden md:block w-36 h-24 object-cover rounded-xl shadow-sm opacity-90"
-            />
-            <Button size="sm" onClick={() => setCreateOpen(true)} className="shrink-0 mt-1">
-              <PenLine className="w-3.5 h-3.5 mr-1.5" /> New post
-            </Button>
-          </div>
+          <Button size="sm" onClick={() => setCreateOpen(true)} className="shrink-0 mt-1">
+            <PenLine className="w-3.5 h-3.5 mr-1.5" /> New post
+          </Button>
         </div>
       </header>
 
