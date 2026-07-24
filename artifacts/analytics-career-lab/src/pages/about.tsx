@@ -11,17 +11,19 @@ export default function About() {
       </header>
       <div className="prose prose-slate dark:prose-invert prose-lg max-w-none text-muted-foreground leading-relaxed">
         <p className="text-foreground font-medium">
-          Data engineering is rarely about the data itself. It's about modeling reality, 
-          reducing entropy, and building systems that developers and stakeholders can trust.
+          I’m an Analytics Engineering leader with a background spanning finance, analytics, and data engineering. I started my career as a CPA at EY before moving into data, and have since worked across SaaS and technology companies as both an analytics manager and technical lead.
         </p>
         <p>
-          Over the past decade, I've worked across the entire data stack—from raw event ingestion to 
-          highly polished executive dashboards. I believe that the best data teams operate like software 
-          engineering teams: they write tests, review code, deploy via CI/CD, and treat their tables 
-          as production APIs.
+          I build data products and platforms that turn complex business problems into reliable, scalable data systems. My work has ranged from revenue and consumption analytics to cost attribution, semantic layers, governed data models, and analytics infrastructure using dbt and Snowflake.
         </p>
         <p>
-          This site is my working lab: a collection of projects, technical guides, and interview preparation materials I've built while continuing to sharpen my craft.
+          I’m especially interested in the intersection of business context, data architecture, and AI—defining the right metrics, designing systems people can trust, and exploring how AI can improve the analytics engineering workflow.
+        </p>
+        <p>
+          This Career Lab is where I document projects, technical patterns, and things I learn along the way.
+        </p>
+        <p>
+          Outside of work, I’m usually exploring new theater shows or learning something new—currently, the flute and ukulele.
         </p>
       </div>
       <section className="space-y-6 pt-8 border-t">
