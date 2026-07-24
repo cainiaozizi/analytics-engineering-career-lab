@@ -105,6 +105,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <main className="flex-1 p-6 lg:p-8 max-w-5xl mx-auto w-full">
           {children}
         </main>
+        <footer className="border-t py-6 px-6 lg:px-8">
+          <p className="text-xs text-muted-foreground text-center">© 2026 Zi Liu. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground text-center mt-2">Projects and examples are generalized or anonymized to protect confidential and proprietary information.</p>
+        </footer>
       </div>
     </div>
   );
