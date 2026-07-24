@@ -44,10 +44,7 @@ export default function About() {
       </section>
       <section className="space-y-6 pt-8 border-t">
         <h2 className="text-xl font-semibold tracking-tight text-foreground">Contact</h2>
-        <p className="text-muted-foreground">
-          I'm always open to discussing data engineering, infrastructure, or interesting problems.
-          Feel free to reach out.
-        </p>
+        <p className="text-muted-foreground">Always happy to connect and talk about analytics engineering, AI, or interesting data problems. Feel free to reach out!</p>
         <div className="flex flex-wrap gap-4">
           <a href="mailto:hello@example.com" className="inline-flex items-center gap-2 px-4 py-2 bg-card border rounded-lg hover:border-primary hover:text-primary transition-colors text-sm font-medium">
             <Mail className="w-4 h-4" /> hello@example.com
