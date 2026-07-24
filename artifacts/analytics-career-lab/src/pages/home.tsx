@@ -16,7 +16,6 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export default function Home() {
-  const { data: stats, isLoading: statsLoading } = useGetStats();
   const { data: home, isLoading: homeLoading } = useGetHomepageData();
   
   const [searchQuery, setSearchQuery] = useState("");
