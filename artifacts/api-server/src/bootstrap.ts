@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { config } from "./config.js";
 import { signPayload, verifySignature, safeEqual } from "./middlewares/requireOwner.js";
+import { logger } from "./lib/logger.js";
 
 /**
  * Bootstrap mode for first-time owner login.
@@ -60,8 +61,10 @@ export function initBootstrap(): void {
   };
 
   const fullLoginUrl = `${config.productionOrigin}/api/auth/google?token=${token}`;
-  // eslint-disable-next-line no-console
-  console.log(
+  // Log to pino so it lands in Replit's production deployment log stream
+  // (fetchDeploymentLogs). Kept identical to the previous console.log banner
+  // so an operator can copy the URL/token straight from the publish-logs pane.
+  logger.info(
     "\n" +
       "=================================================================\n" +
       "[bootstrap] OWNER_GOOGLE_SUB is not configured.\n" +
@@ -161,8 +164,7 @@ export function consumeBootstrapToken(): boolean {
 export function recordBootstrapClaim(sub: string): void {
   if (!state) return;
   state.claimedSub = sub;
-  // eslint-disable-next-line no-console
-  console.log(
+  logger.info(
     "[bootstrap] First owner login recorded.\n" +
       "[bootstrap] Sub: " +
       sub +

@@ -179,6 +179,8 @@ authRouter.get("/google/callback", async (req, res): Promise<void> => {
       return;
     }
 
+    logger.info({ sub }, "[auth] owner authenticated via Google OAuth");
+
     const cookieValue = buildSessionCookie(sub);
     res.cookie(
       COOKIE_NAME,
