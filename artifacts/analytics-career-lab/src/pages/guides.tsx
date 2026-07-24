@@ -17,7 +17,7 @@ export default function Blog() {
       <header className="space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Guides</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Writings</h1>
             <p className="text-lg text-muted-foreground">What I know.</p>
           </div>
           <Button size="sm" onClick={() => setCreateOpen(true)} className="shrink-0 mt-1">
@@ -25,9 +25,7 @@ export default function Blog() {
           </Button>
         </div>
       </header>
-
       <CreatePost open={createOpen} onOpenChange={setCreateOpen} />
-
       {isLoading ? (
         <div className="space-y-8">
           <Skeleton className="h-32 w-full" />
