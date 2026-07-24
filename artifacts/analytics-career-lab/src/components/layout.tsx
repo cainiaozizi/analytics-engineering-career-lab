@@ -93,9 +93,14 @@ export function MobileNav() {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Background illustration */}
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat pointer-events-none opacity-[0.18]"
+        style={{ backgroundImage: "url('/bg.png')" }}
+      />
       <Sidebar />
-      <div className="lg:pl-64 flex flex-col min-h-screen">
+      <div className="lg:pl-64 flex flex-col min-h-screen relative">
         <MobileNav />
         <main className="flex-1 p-6 lg:p-8 max-w-5xl mx-auto w-full">
           {children}
