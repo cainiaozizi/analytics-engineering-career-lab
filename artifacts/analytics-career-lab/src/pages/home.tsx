@@ -4,10 +4,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, ArrowRight, Folder, FileText, Bookmark, MessageSquare } from "lucide-react";
+import { Search, ArrowRight, Folder, FileText, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { formatDate } from "@/lib/utils";
+
+const TYPE_LABELS: Record<string, string> = {
+  project: "project",
+  post: "guide",
+  note: "interview prep",
+};
 
 export default function Home() {
   const { data: stats, isLoading: statsLoading } = useGetStats();
@@ -22,14 +28,18 @@ export default function Home() {
   );
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-10">
       {/* Intro */}
-      <section className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">Data Analytics Engineering Lab</h1>
+      <section className="space-y-3">
+        <h1 className="text-4xl font-bold tracking-tight">Analytics Engineering Career Lab</h1>
         <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
-          A working knowledge hub and public portfolio. Where engineering rigor meets intellectual curiosity.
+          A working knowledge base and public portfolio — where I document what I build, what I know, and what I'm learning.
         </p>
+        <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+          About me <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
       </section>
+
       {/* Search */}
       <section className="relative z-10 max-w-2xl">
         <div className="relative">
@@ -37,7 +47,7 @@ export default function Home() {
           <Input 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search projects, writing, notes..." 
+            placeholder="Search projects, guides, interview prep..." 
             className="pl-10 h-12 text-base rounded-xl bg-card border-2 border-border shadow-sm focus-visible:ring-primary"
           />
         </div>
@@ -56,12 +66,18 @@ export default function Home() {
                 {searchResults?.results?.map((result) => (
                   <Link 
                     key={`${result.type}-${result.id}`} 
-                    href={result.type === 'project' ? `/projects/${result.id}` : result.type === 'post' ? `/guides/${result.id}` : result.type === 'note' ? `/interview-prep/${result.id}` : `/interview-prep/${result.id}`}
+                    href={
+                      result.type === 'project' ? `/projects/${result.id}` :
+                      result.type === 'post' ? `/guides/${result.id}` :
+                      `/interview-prep/${result.id}`
+                    }
                     className="flex flex-col p-4 border-b last:border-0 hover:bg-accent/50 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-medium">{result.title}</span>
-                      <Badge variant="outline" className="text-[10px] uppercase tracking-wider">{result.type}</Badge>
+                      <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
+                        {TYPE_LABELS[result.type] ?? result.type}
+                      </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-1">{result.excerpt}</p>
                   </Link>
@@ -71,21 +87,22 @@ export default function Home() {
           </div>
         )}
       </section>
+
       {/* Stats Bar */}
       <section>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           {statsLoading ? (
-            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)
+            Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)
           ) : stats ? (
             <>
-              <StatCard icon={Folder} label="Projects" value={stats.publicProjects} />
-              <StatCard icon={FileText} label="Posts" value={stats.publicPosts} />
-              <StatCard icon={Bookmark} label="Notes" value={stats.totalNotes} />
-              <StatCard icon={MessageSquare} label="Interview Qs" value={stats.interviewEntries} />
+              <StatCard icon={Folder}      label="Projects"       value={stats.publicProjects} />
+              <StatCard icon={FileText}    label="Guides"         value={stats.publicPosts} />
+              <StatCard icon={MessageSquare} label="Interview Prep" value={stats.totalNotes} />
             </>
           ) : null}
         </div>
       </section>
+
       {/* Content Grids */}
       {homeLoading ? (
         <div className="space-y-8">
@@ -93,7 +110,7 @@ export default function Home() {
           <Skeleton className="h-48 w-full" />
         </div>
       ) : home ? (
-        <div className="space-y-12">
+        <div className="space-y-10">
           {/* Featured Projects */}
           {home.featuredProjects.length > 0 && (
             <section className="space-y-6">
@@ -128,17 +145,17 @@ export default function Home() {
             </section>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* Featured Knowledge */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {/* Guides */}
             {home.featuredKnowledge.length > 0 && (
               <section className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold tracking-tight">Writing</h2>
+                  <h2 className="text-2xl font-semibold tracking-tight">Guides</h2>
                   <Link href="/guides" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
-                    All posts <ArrowRight className="w-4 h-4" />
+                    All guides <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {home.featuredKnowledge.map(post => (
                     <Link key={post.id} href={`/guides/${post.id}`} className="group block">
                       <div className="p-4 rounded-xl border border-transparent hover:border-border hover:bg-card transition-all">
@@ -154,34 +171,26 @@ export default function Home() {
               </section>
             )}
 
-            {/* Recent Notes */}
+            {/* Interview Prep */}
             {home.recentNotes.length > 0 && (
               <section className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold tracking-tight">Recent Notes</h2>
+                  <h2 className="text-2xl font-semibold tracking-tight">Interview Prep</h2>
                   <Link href="/interview-prep" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
-                    All notes <ArrowRight className="w-4 h-4" />
+                    All entries <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {home.recentNotes.map(note => (
                     <Link key={note.id} href={`/interview-prep/${note.id}`} className="group block">
-                      <div className="p-4 rounded-xl border border-transparent hover:border-border hover:bg-card transition-all flex items-start gap-4">
-                        <div className="bg-muted p-2 rounded-lg group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                          <Bookmark className="w-4 h-4" />
+                      <div className="p-4 rounded-xl border border-transparent hover:border-border hover:bg-card transition-all">
+                        <div className="flex items-baseline justify-between mb-1">
+                          <h3 className="font-semibold group-hover:text-primary transition-colors">{note.title}</h3>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap ml-4">{formatDate(note.createdAt)}</span>
                         </div>
-                        <div>
-                          <h3 className="font-medium group-hover:text-primary transition-colors">{note.title}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-muted-foreground">{formatDate(note.createdAt)}</span>
-                            {note.tags && note.tags.length > 0 && (
-                              <>
-                                <span className="text-muted-foreground/30">•</span>
-                                <span className="text-xs text-muted-foreground">{note.tags[0]}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
+                        {note.tags && note.tags.length > 0 && (
+                          <p className="text-sm text-muted-foreground">{note.tags.slice(0, 3).join(" · ")}</p>
+                        )}
                       </div>
                     </Link>
                   ))}
