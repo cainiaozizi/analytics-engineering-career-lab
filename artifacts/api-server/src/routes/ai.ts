@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { requireOwner } from "../middlewares/requireOwner.js";
 
 export const aiRouter = Router();
 
@@ -7,7 +8,8 @@ export const aiRouter = Router();
 // Sends raw body text (from PDF/DOCX extraction or manual entry) to GPT and
 // returns clean, well-structured Markdown. Preserves meaning; only fixes
 // formatting, structure, and clarity.
-aiRouter.post("/format-body", async (req, res) => {
+// Owner-only: this endpoint creates/modifies content via AI.
+aiRouter.post("/format-body", requireOwner, async (req, res) => {
   const { body: rawBody, title, context } = req.body as {
     body: string;
     title?: string;

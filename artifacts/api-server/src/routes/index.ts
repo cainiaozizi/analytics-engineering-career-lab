@@ -1,15 +1,17 @@
 import { Router, type IRouter } from "express";
-import healthRouter from "./health";
-import projectsRouter from "./projects";
-import postsRouter from "./posts";
-import notesRouter from "./notes";
-import interviewRouter from "./interview";
-import homepageRouter from "./homepage";
-import { aiRouter } from "./ai";
-import storageRouter from "./storage";
+import healthRouter from "./health.js";
+import projectsRouter from "./projects.js";
+import postsRouter from "./posts.js";
+import notesRouter from "./notes.js";
+import interviewRouter from "./interview.js";
+import homepageRouter from "./homepage.js";
+import { aiRouter } from "./ai.js";
+import storageRouter from "./storage.js";
+import { authRouter } from "./auth.js";
 
 const router: IRouter = Router();
 
+router.use("/auth", authRouter);
 router.use(healthRouter);
 router.use(projectsRouter);
 router.use(postsRouter);

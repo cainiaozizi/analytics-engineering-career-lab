@@ -13,6 +13,7 @@ import {
   UpdateNoteResponse,
   DeleteNoteParams,
 } from "@workspace/api-zod";
+import { requireOwner } from "../middlewares/requireOwner.js";
 
 const router: IRouter = Router();
 
@@ -44,7 +45,7 @@ router.get("/notes", async (req, res): Promise<void> => {
   res.json(ListNotesResponse.parse(rows));
 });
 
-router.post("/notes", async (req, res): Promise<void> => {
+router.post("/notes", requireOwner, async (req, res): Promise<void> => {
   const parsed = CreateNoteBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -79,7 +80,7 @@ router.get("/notes/:id", async (req, res): Promise<void> => {
   res.json(GetNoteResponse.parse(note));
 });
 
-router.patch("/notes/:id", async (req, res): Promise<void> => {
+router.patch("/notes/:id", requireOwner, async (req, res): Promise<void> => {
   const params = UpdateNoteParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -106,7 +107,7 @@ router.patch("/notes/:id", async (req, res): Promise<void> => {
   res.json(UpdateNoteResponse.parse(note));
 });
 
-router.delete("/notes/:id", async (req, res): Promise<void> => {
+router.delete("/notes/:id", requireOwner, async (req, res): Promise<void> => {
   const params = DeleteNoteParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

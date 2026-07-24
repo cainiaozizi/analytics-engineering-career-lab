@@ -1,5 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { initBootstrap } from "./bootstrap.js";
 
 const rawPort = process.env["PORT"];
 
@@ -14,6 +15,9 @@ const port = Number(rawPort);
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
+
+// Initialize bootstrap mode FIRST, before any HTTP listener accepts traffic.
+initBootstrap();
 
 app.listen(port, (err) => {
   if (err) {

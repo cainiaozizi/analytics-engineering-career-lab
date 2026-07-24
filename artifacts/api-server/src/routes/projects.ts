@@ -13,6 +13,7 @@ import {
   UpdateProjectResponse,
   DeleteProjectParams,
 } from "@workspace/api-zod";
+import { requireOwner } from "../middlewares/requireOwner.js";
 
 const router: IRouter = Router();
 
@@ -40,7 +41,7 @@ router.get("/projects", async (req, res): Promise<void> => {
   res.json(ListProjectsResponse.parse(rows));
 });
 
-router.post("/projects", async (req, res): Promise<void> => {
+router.post("/projects", requireOwner, async (req, res): Promise<void> => {
   const parsed = CreateProjectBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -76,7 +77,7 @@ router.get("/projects/:id", async (req, res): Promise<void> => {
   res.json(GetProjectResponse.parse(project));
 });
 
-router.patch("/projects/:id", async (req, res): Promise<void> => {
+router.patch("/projects/:id", requireOwner, async (req, res): Promise<void> => {
   const params = UpdateProjectParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -103,7 +104,7 @@ router.patch("/projects/:id", async (req, res): Promise<void> => {
   res.json(UpdateProjectResponse.parse(project));
 });
 
-router.delete("/projects/:id", async (req, res): Promise<void> => {
+router.delete("/projects/:id", requireOwner, async (req, res): Promise<void> => {
   const params = DeleteProjectParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
