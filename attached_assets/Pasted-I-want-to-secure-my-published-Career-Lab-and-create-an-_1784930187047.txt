@@ -1,0 +1,147 @@
+I want to secure my published Career Lab and create an OWNER-ONLY admin workflow.
+
+Current situation:
+- The production website is public.
+- Projects, Posts, Notes, and Interview Prep should remain publicly readable.
+- Currently, unauthenticated visitors can also upload/create/edit/delete content, which needs to be fixed.
+- I want to continue creating and editing content directly from the LIVE production website rather than creating content in the Replit development environment and migrating it to production.
+
+Please design an authentication and authorization plan with the following requirements:
+
+1. GOOGLE LOGIN / OWNER AUTHENTICATION
+
+I want to sign in using my Google/Gmail account if supported by the recommended authentication solution.
+
+Authentication should establish who the user is.
+
+Authorization must separately verify that the authenticated user is specifically the owner of this website.
+
+Do NOT assume that any authenticated Google user should receive admin access.
+
+Prefer a stable identity identifier from the authentication provider for owner authorization rather than relying only on an email address, if supported.
+
+Store the allowed owner/admin identity securely in a server-side Replit Secret/environment variable.
+
+Do not expose my Gmail address or owner identifier in frontend code.
+
+
+2. PUBLIC ACCESS
+
+Unauthenticated visitors should continue to be able to:
+
+- View public Projects
+- View public Posts
+- View public Notes
+- View public Interview Prep
+
+Public visitors should NOT need an account to read the website.
+
+
+3. OWNER-ONLY ACCESS
+
+Only my authenticated owner account should be able to:
+
+- Upload files
+- Create content
+- Edit content
+- Delete content
+- Publish content
+- Change visibility
+- Call POST/PATCH/PUT/DELETE endpoints
+- Request storage upload URLs
+
+The backend must enforce this.
+
+Simply hiding admin buttons in the frontend is NOT sufficient.
+
+
+4. BACKEND SECURITY
+
+Audit and protect all write endpoints for:
+
+- Projects
+- Posts
+- Notes
+- Interview Prep
+- Storage/uploads
+- Any AI/content-processing endpoints that can create or modify content
+
+GET endpoints required to display public content should remain public.
+
+Owner-only authorization should happen server-side before any database or storage modification occurs.
+
+CORS can also be restricted appropriately, but CORS must NOT be treated as authentication or authorization.
+
+
+5. FRONTEND EXPERIENCE
+
+When signed out:
+
+- Website behaves like a normal public portfolio.
+- Upload/Create/Edit/Delete controls are hidden.
+- An unobtrusive Admin Login or Sign In option can be available.
+
+When I sign in with my authorized Google account:
+
+- Upload/Create/Edit/Delete controls become available.
+- I can use the existing content workflow directly on the production website.
+
+Desired publishing workflow:
+
+Live Production Website
+        ↓
+Owner Login with Google
+        ↓
+Upload File
+        ↓
+Edit Content / Title / Tags / Metadata
+        ↓
+Publish
+        ↓
+Production Database
+        ↓
+Immediately Visible on Public Website
+
+Adding content should NOT require:
+- editing in the Replit dev environment
+- manually syncing dev and prod databases
+- a GitHub commit
+- republishing the application
+
+
+6. IMPORTANT DISTINCTION
+
+Content changes and application changes should remain separate workflows.
+
+CONTENT:
+Production website → Owner login → Create/Edit/Publish → Production DB
+
+APPLICATION/CODE CHANGES:
+Replit development → Test → Git/version control → Republish application
+
+
+7. EXISTING DATA
+
+Do not modify, delete, reseed, or migrate any existing production content as part of adding authentication.
+
+The existing production database and object storage content must remain intact.
+
+
+BEFORE IMPLEMENTING ANYTHING:
+
+Give me a plan explaining:
+
+1. Which authentication provider you recommend and why.
+2. Whether Google/Gmail login is supported.
+3. Exactly how Google authentication will work.
+4. Which stable identifier will be used to recognize my owner account.
+5. Which Replit Secrets/environment variables will be required.
+6. Exactly which backend routes will become owner-only.
+7. Which GET routes will remain public.
+8. What frontend components will change based on authentication state.
+9. How I will perform my first owner login on the production website.
+10. How we will test that a random unauthenticated visitor cannot modify production data.
+11. How we will test that an authenticated NON-owner cannot modify production data.
+12. How we will verify that my owner account can still upload, create, edit, and delete content successfully.
+
+Do not implement anything yet. I want to review and approve the plan first.
