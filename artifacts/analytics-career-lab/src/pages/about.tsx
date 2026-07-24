@@ -12,7 +12,7 @@ export default function About() {
       <div className="prose prose-slate dark:prose-invert prose-lg max-w-none text-muted-foreground leading-relaxed">
         <p className="text-foreground font-medium">I’m an Analytics Engineering leader with a background spanning finance, analytics, and data engineering. I started my career as a CPA before moving into data, and have since worked across SaaS and Financial spaces as both an analytics manager and technical lead.</p>
         <p>
-          I build data products and platforms that turn complex business problems into reliable, scalable data systems. My work has ranged from revenue and consumption analytics to cost attribution, semantic layers, governed data models, and analytics infrastructure using dbt and Snowflake.
+          I enjoy building data products and platforms that turn complex business problems into reliable, scalable systems. My work has ranged from revenue and consumption analytics to cost attribution, semantic layers, governed data models, and analytics infrastructure using dbt and Snowflake.
         </p>
         <p>
           I’m especially interested in the intersection of business context, data architecture, and AI—defining the right metrics, designing systems people can trust, and exploring how AI can improve the analytics engineering workflow.
