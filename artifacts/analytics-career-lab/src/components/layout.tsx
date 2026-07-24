@@ -19,7 +19,7 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-20 w-64 border-r bg-sidebar hidden flex-col lg:flex">
       <div className="flex h-14 items-center border-b px-6">
-        <span className="font-semibold tracking-tight">Zi's Analytics Engineering Lab</span>
+        <span className="font-semibold tracking-tight">Analytics Engineering Lab</span>
       </div>
       <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
         {navItems.map((item) => {

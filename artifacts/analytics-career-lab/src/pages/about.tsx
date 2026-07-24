@@ -9,10 +9,11 @@ export default function About() {
           alt="Zi Liu"
           className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover ring-2 ring-primary/15 shadow-sm shrink-0"
         />
+
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">About Me</h1>
-          <p className="text-lg font-semibold text-foreground">Zi Liu</p>
-          <p className="text-sm text-muted-foreground font-medium">
+          <h1 className="text-4xl font-bold tracking-tight">Zi Liu</h1>
+          
+          <p className="text-base text-muted-foreground leading-relaxed pt-1">
             Data Analytics &amp; Engineering | SaaS | Finance
           </p>
           <p className="text-base text-muted-foreground leading-relaxed pt-1">
@@ -32,14 +33,14 @@ export default function About() {
           This Career Lab is where I document projects, technical patterns, and things I learn along the way.
         </p>
         <p>
-          Outside of work, I'm usually exploring new theater shows or learning something new—currently, the flute and ukulele.
+          Outside of work, I'm usually exploring new theater shows or learning something new—currently, the ukulele and latte art.
         </p>
       </div>
 
       <section className="space-y-6 pt-8 border-t">
         <div className="space-y-1">
           <h2 className="text-xl font-semibold tracking-tight text-foreground">Core Competencies</h2>
-          <p className="text-sm text-muted-foreground">Where I spend most of my time and energy.</p>
+          
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-3">
