@@ -9,7 +9,6 @@ export default function About() {
           I build data products, infrastructure, and the tools that connect them.
         </p>
       </header>
-
       <div className="prose prose-slate dark:prose-invert prose-lg max-w-none text-muted-foreground leading-relaxed">
         <p className="text-foreground font-medium">
           Data engineering is rarely about the data itself. It's about modeling reality, 
@@ -27,7 +26,6 @@ export default function About() {
           tinkering with frontend frameworks, or trying to make sense of complex domains.
         </p>
       </div>
-
       <section className="space-y-6 pt-8 border-t">
         <h2 className="text-xl font-semibold tracking-tight text-foreground">Core Competencies</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -51,7 +49,6 @@ export default function About() {
           </div>
         </div>
       </section>
-
       <section className="space-y-6 pt-8 border-t">
         <h2 className="text-xl font-semibold tracking-tight text-foreground">Contact</h2>
         <p className="text-muted-foreground">
