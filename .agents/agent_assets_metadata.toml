@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "181GZ8pqxgQGc9X-dvVBv"
+uri = "file://migrations/migrate-dev-to-prod-FINAL.sql"
+type = "unspecified"
+title = "Dev-to-Prod Migration SQL"
