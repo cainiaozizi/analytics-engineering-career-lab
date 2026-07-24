@@ -1,10 +1,10 @@
-import { useGetHomepageData, useGetStats, useSearchContent, getSearchContentQueryKey } from "@workspace/api-client-react";
+import { useGetHomepageData, useSearchContent, getSearchContentQueryKey } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, ArrowRight, Folder, FileText } from "lucide-react";
+import { Search, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { formatDate } from "@/lib/utils";
@@ -94,19 +94,6 @@ export default function Home() {
             )}
           </div>
         )}
-      </section>
-      {/* Stats Bar */}
-      <section>
-        <div className="grid grid-cols-2 gap-4">
-          {statsLoading ? (
-            Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)
-          ) : stats ? (
-            <>
-              <StatCard icon={Folder}   label="Projects" value={stats.publicProjects} />
-              <StatCard icon={FileText} label="Guides"   value={stats.publicPosts} />
-            </>
-          ) : null}
-        </div>
       </section>
       {/* Content Grids */}
       {homeLoading ? (
@@ -206,17 +193,5 @@ export default function Home() {
         </div>
       ) : null}
     </div>
-  );
-}
-
-function StatCard({ icon: Icon, label, value }: { icon: any, label: string, value: number }) {
-  return (
-    <Card className="bg-card border-border shadow-sm">
-      <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-        <Icon className="w-5 h-5 text-primary mb-1 md:mb-2" />
-        <p className="text-2xl md:text-3xl font-bold font-mono">{value}</p>
-        <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
-      </CardContent>
-    </Card>
   );
 }
