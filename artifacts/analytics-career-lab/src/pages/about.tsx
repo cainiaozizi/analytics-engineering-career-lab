@@ -4,15 +4,13 @@ export default function About() {
   return (
     <div className="max-w-3xl space-y-12">
       <header className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">About</h1>
+        <h1 className="text-4xl font-bold tracking-tight">About Me</h1>
         <p className="text-xl text-muted-foreground leading-relaxed">
           I build data products, infrastructure, and the tools that connect them.
         </p>
       </header>
       <div className="prose prose-slate dark:prose-invert prose-lg max-w-none text-muted-foreground leading-relaxed">
-        <p className="text-foreground font-medium">
-          I’m an Analytics Engineering leader with a background spanning finance, analytics, and data engineering. I started my career as a CPA at EY before moving into data, and have since worked across SaaS and technology companies as both an analytics manager and technical lead.
-        </p>
+        <p className="text-foreground font-medium">I’m an Analytics Engineering leader with a background spanning finance, analytics, and data engineering. I started my career as a CPA before moving into data, and have since worked across SaaS and Financial spaces as both an analytics manager and technical lead.</p>
         <p>
           I build data products and platforms that turn complex business problems into reliable, scalable data systems. My work has ranged from revenue and consumption analytics to cost attribution, semantic layers, governed data models, and analytics infrastructure using dbt and Snowflake.
         </p>
