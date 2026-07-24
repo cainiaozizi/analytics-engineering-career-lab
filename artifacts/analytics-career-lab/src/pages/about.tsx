@@ -21,9 +21,7 @@ export default function About() {
           as production APIs.
         </p>
         <p>
-          Currently, I'm a Senior Analytics Engineer focusing on scalable semantic models and reliable 
-          data platforms. When I'm not writing SQL or Python, I'm usually reading about system design, 
-          tinkering with frontend frameworks, or trying to make sense of complex domains.
+          This site is my working lab: a collection of projects, technical guides, and interview preparation materials I've built while continuing to sharpen my craft.
         </p>
       </div>
       <section className="space-y-6 pt-8 border-t">
