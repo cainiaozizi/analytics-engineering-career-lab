@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Analytics Engineering Career Lab"
+version = "1.0.0"
+id = "artifacts/analytics-career-lab"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22868
+
+[services.development]
+run = "pnpm --filter @workspace/analytics-career-lab run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/analytics-career-lab", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/analytics-career-lab/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22868"
+BASE_PATH = "/"
