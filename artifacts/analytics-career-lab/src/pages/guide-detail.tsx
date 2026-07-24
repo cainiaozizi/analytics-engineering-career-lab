@@ -31,7 +31,7 @@ export default function PostDetail() {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListPostsQueryKey() });
-        navigate("/guides");
+        navigate("/writings");
       },
     },
   });
@@ -52,8 +52,8 @@ export default function PostDetail() {
   if (!post) {
     return (
       <div className="max-w-3xl space-y-4">
-        <Link href="/guides" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Guides
+        <Link href="/writings" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Writings
         </Link>
         <div className="border border-dashed rounded-xl p-12 text-center space-y-2">
           <p className="text-lg font-medium">Post not found</p>
@@ -66,8 +66,8 @@ export default function PostDetail() {
   return (
     <article className="max-w-3xl mx-auto space-y-12">
       <div className="flex items-center justify-between">
-        <Link href="/guides" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Guides
+        <Link href="/writings" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Writings
         </Link>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>

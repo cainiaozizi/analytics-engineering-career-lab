@@ -57,7 +57,7 @@ export default function Blog() {
               </div>
               <div className="group relative w-full">
                 <h3 className="mt-3 text-2xl font-semibold leading-tight text-foreground group-hover:text-primary transition-colors">
-                  <Link href={`/guides/${post.id}`}>
+                  <Link href={`/writings/${post.id}`}>
                     <span className="absolute inset-0" />
                     {post.title}
                   </Link>

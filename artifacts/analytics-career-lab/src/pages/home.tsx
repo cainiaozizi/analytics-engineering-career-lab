@@ -11,7 +11,7 @@ import { formatDate } from "@/lib/utils";
 
 const TYPE_LABELS: Record<string, string> = {
   project: "project",
-  post: "guide",
+  post: "writing",
   note: "interview prep",
 };
 
@@ -43,7 +43,7 @@ export default function Home() {
           <Input 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search projects, guides, interview prep..." 
+            placeholder="Search projects, writings, interview prep..." 
             className="pl-10 h-12 text-base rounded-xl bg-card border-2 border-border shadow-sm focus-visible:ring-primary"
           />
         </div>
@@ -62,11 +62,11 @@ export default function Home() {
                 {searchResults?.results?.map((result) => {
                   const itemHref =
                     result.type === 'project' ? `/projects/${result.id}` :
-                    result.type === 'post' ? `/guides/${result.id}` :
+                    result.type === 'post' ? `/writings/${result.id}` :
                     `/interview-prep/${result.id}`;
                   const sectionHref =
                     result.type === 'project' ? '/projects' :
-                    result.type === 'post' ? '/guides' :
+                    result.type === 'post' ? '/writings' :
                     '/interview-prep';
                   return (
                     <div
@@ -142,13 +142,13 @@ export default function Home() {
               <section className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold tracking-tight">Writings</h2>
-                  <Link href="/guides" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
-                    All guides <ArrowRight className="w-4 h-4" />
+                  <Link href="/writings" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
+                    All writings <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
                 <div className="space-y-3">
                   {home.featuredKnowledge.map(post => (
-                    <Link key={post.id} href={`/guides/${post.id}`} className="group block">
+                    <Link key={post.id} href={`/writings/${post.id}`} className="group block">
                       <div className="p-4 rounded-xl border border-transparent hover:border-border hover:bg-card transition-all">
                         <div className="flex items-baseline justify-between mb-1">
                           <h3 className="font-semibold group-hover:text-primary transition-colors">{post.title}</h3>
