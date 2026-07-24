@@ -1,0 +1,1004 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Analytics Engineering Career Lab API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: ai
+    description: AI utility operations
+  - name: Storage
+    description: Object storage upload and serving endpoints.
+  - name: projects
+    description: Portfolio projects
+  - name: posts
+    description: Blog posts and technical writing
+  - name: notes
+    description: Engineering notes
+  - name: interview
+    description: Interview preparation entries
+  - name: homepage
+    description: Homepage aggregated data
+
+paths:
+  # ── Storage ──────────────────────────────────────────────────────────────────
+  /storage/uploads/request-url:
+    post:
+      tags: [Storage]
+      operationId: requestUploadUrl
+      summary: Request a presigned URL for file upload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadUrlRequest'
+      responses:
+        '200':
+          description: Presigned upload URL generated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadUrlResponse'
+        '400':
+          description: Missing or invalid required fields.
+        '500':
+          description: Failed to generate upload URL.
+
+  /storage/public-objects/{filePath}:
+    get:
+      tags: [Storage]
+      operationId: getPublicObject
+      summary: Serve a public asset
+      parameters:
+        - name: filePath
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Object content streamed.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: File not found.
+
+  /storage/objects/{objectPath}:
+    get:
+      tags: [Storage]
+      operationId: getStorageObject
+      summary: Serve an uploaded object
+      parameters:
+        - name: objectPath
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Object content streamed.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Object not found.
+
+  # ── AI Utilities ─────────────────────────────────────────────────────────────
+  /ai/format-body:
+    post:
+      operationId: formatBody
+      tags: [ai]
+      summary: Clean and reformat raw body text into well-structured Markdown
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FormatBodyInput"
+      responses:
+        "200":
+          description: Reformatted Markdown
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FormatBodyResult"
+
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ── Projects ────────────────────────────────────────────────────────────────
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: List all projects
+      parameters:
+        - in: query
+          name: visibility
+          schema:
+            type: string
+            enum: [public, private, draft]
+        - in: query
+          name: featured
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+    post:
+      operationId: createProject
+      tags: [projects]
+      summary: Create a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+
+  /projects/{id}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: Get a project
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateProject
+      tags: [projects]
+      summary: Update a project
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+    delete:
+      operationId: deleteProject
+      tags: [projects]
+      summary: Delete a project
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Blog Posts ───────────────────────────────────────────────────────────────
+  /posts:
+    get:
+      operationId: listPosts
+      tags: [posts]
+      summary: List blog posts
+      parameters:
+        - in: query
+          name: visibility
+          schema:
+            type: string
+            enum: [public, private, draft]
+        - in: query
+          name: tag
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+    post:
+      operationId: createPost
+      tags: [posts]
+      summary: Create a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+
+  /posts/{id}:
+    get:
+      operationId: getPost
+      tags: [posts]
+      summary: Get a post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: Not found
+    patch:
+      operationId: updatePost
+      tags: [posts]
+      summary: Update a post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+    delete:
+      operationId: deletePost
+      tags: [posts]
+      summary: Delete a post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Engineering Notes ────────────────────────────────────────────────────────
+  /notes:
+    get:
+      operationId: listNotes
+      tags: [notes]
+      summary: List engineering notes
+      parameters:
+        - in: query
+          name: visibility
+          schema:
+            type: string
+            enum: [public, private, draft]
+        - in: query
+          name: tag
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of notes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Note"
+    post:
+      operationId: createNote
+      tags: [notes]
+      summary: Create a note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+
+  /notes/{id}:
+    get:
+      operationId: getNote
+      tags: [notes]
+      summary: Get a note
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateNote
+      tags: [notes]
+      summary: Update a note
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+    delete:
+      operationId: deleteNote
+      tags: [notes]
+      summary: Delete a note
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Interview Prep ──────────────────────────────────────────────────────────
+  /interview:
+    get:
+      operationId: listInterviewEntries
+      tags: [interview]
+      summary: List interview prep entries
+      parameters:
+        - in: query
+          name: topic
+          schema:
+            type: string
+        - in: query
+          name: difficulty
+          schema:
+            type: string
+            enum: [easy, medium, hard]
+      responses:
+        "200":
+          description: List of interview entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InterviewEntry"
+    post:
+      operationId: createInterviewEntry
+      tags: [interview]
+      summary: Create an interview entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InterviewEntryInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterviewEntry"
+
+  /interview/{id}:
+    get:
+      operationId: getInterviewEntry
+      tags: [interview]
+      summary: Get an interview entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Interview entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterviewEntry"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateInterviewEntry
+      tags: [interview]
+      summary: Update an interview entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InterviewEntryUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterviewEntry"
+    delete:
+      operationId: deleteInterviewEntry
+      tags: [interview]
+      summary: Delete an interview entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Homepage Aggregation ─────────────────────────────────────────────────────
+  /homepage:
+    get:
+      operationId: getHomepageData
+      tags: [homepage]
+      summary: Aggregated homepage data
+      responses:
+        "200":
+          description: Homepage data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HomepageData"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [homepage]
+      summary: Content statistics
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
+
+  /search:
+    get:
+      operationId: searchContent
+      tags: [homepage]
+      summary: Search across all content
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResults"
+
+  /interview/topics:
+    get:
+      operationId: listInterviewTopics
+      tags: [interview]
+      summary: List all interview prep topics with counts
+      responses:
+        "200":
+          description: Topics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TopicSummary"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    # ── Shared ──────────────────────────────────────────────────────────────────
+    Visibility:
+      type: string
+      enum: [public, private, draft]
+
+    # ── Project ─────────────────────────────────────────────────────────────────
+    Project:
+      type: object
+      required: [id, title, description, visibility, featured, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        body:
+          type: ["string", "null"]
+        tags:
+          type: array
+          items:
+            type: string
+        githubUrl:
+          type: ["string", "null"]
+        liveUrl:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        techStack:
+          type: array
+          items:
+            type: string
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+        featured:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ProjectInput:
+      type: object
+      required: [title, description]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        githubUrl:
+          type: string
+        liveUrl:
+          type: string
+        techStack:
+          type: array
+          items:
+            type: string
+        imageUrl:
+          type: string
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+        featured:
+          type: boolean
+
+    ProjectUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        githubUrl:
+          type: string
+        liveUrl:
+          type: string
+        techStack:
+          type: array
+          items:
+            type: string
+        imageUrl:
+          type: string
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+        featured:
+          type: boolean
+
+    # ── Post ────────────────────────────────────────────────────────────────────
+    Post:
+      type: object
+      required: [id, title, summary, body, visibility, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        summary:
+          type: string
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        readingTimeMinutes:
+          type: ["integer", "null"]
+        coverImage:
+          type: ["string", "null"]
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PostInput:
+      type: object
+      required: [title, summary, body]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        summary:
+          type: string
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        readingTimeMinutes:
+          type: integer
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    PostUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        summary:
+          type: string
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        readingTimeMinutes:
+          type: integer
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    # ── Note ────────────────────────────────────────────────────────────────────
+    Note:
+      type: object
+      required: [id, title, body, visibility, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    NoteInput:
+      type: object
+      required: [title, body]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    NoteUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    # ── Interview Entry ──────────────────────────────────────────────────────────
+    InterviewEntry:
+      type: object
+      required: [id, question, answer, topic, difficulty, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        question:
+          type: string
+        answer:
+          type: string
+        topic:
+          type: string
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    InterviewEntryInput:
+      type: object
+      required: [question, answer, topic]
+      properties:
+        question:
+          type: string
+          minLength: 1
+        answer:
+          type: string
+        topic:
+          type: string
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+        tags:
+          type: array
+          items:
+            type: string
+
+    InterviewEntryUpdate:
+      type: object
+      properties:
+        question:
+          type: string
+        answer:
+          type: string
+        topic:
+          type: string
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+        tags:
+          type: array
+          items:
+            type: string
+
+    # ── Aggregates ────────────────────────────────────────────────────────────────
+    HomepageData:
+      type: object
+      required: [featuredProjects, featuredKnowledge, recentNotes]
+      properties:
+        featuredProjects:
+          type: array
+          items:
+            $ref: "#/components/schemas/Project"
+        featuredKnowledge:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        recentNotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Note"
+
+    Stats:
+      type: object
+      required: [publicProjects, publicPosts, totalNotes, interviewEntries]
+      properties:
+        publicProjects:
+          type: integer
+        publicPosts:
+          type: integer
+        totalNotes:
+          type: integer
+        interviewEntries:
+          type: integer
+
+    SearchResult:
+      type: object
+      required: [id, type, title, excerpt]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [project, post, note, interview]
+        title:
+          type: string
+        excerpt:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    SearchResults:
+      type: object
+      required: [results, total]
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResult"
+        total:
+          type: integer
+
+    FormatBodyInput:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+          description: Raw body text to reformat
+        title:
+          type: string
+          description: Optional title hint for context
+        context:
+          type: string
+          enum: [project, post, note]
+          description: Content type context
+
+    FormatBodyResult:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+          description: Reformatted Markdown body
+
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        size:
+          type: integer
+          minimum: 1
+        contentType:
+          type: string
+          minLength: 1
+
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL:
+          type: string
+        objectPath:
+          type: string
+
+    TopicSummary:
+      type: object
+      required: [topic, count]
+      properties:
+        topic:
+          type: string
+        count:
+          type: integer
