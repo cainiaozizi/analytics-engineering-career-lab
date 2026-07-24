@@ -1,4 +1,4 @@
-import { Mail, Github, Linkedin, Twitter } from "lucide-react";
+import { Mail, Linkedin } from "lucide-react";
 
 export default function About() {
   return (
@@ -50,17 +50,11 @@ export default function About() {
         <h2 className="text-xl font-semibold tracking-tight text-foreground">Contact</h2>
         <p className="text-muted-foreground">Always happy to connect and talk about analytics engineering, AI, or interesting data problems. Feel free to reach out!</p>
         <div className="flex flex-wrap gap-4">
-          <a href="mailto:hello@example.com" className="inline-flex items-center gap-2 px-4 py-2 bg-card border rounded-lg hover:border-primary hover:text-primary transition-colors text-sm font-medium">
-            <Mail className="w-4 h-4" /> hello@example.com
+          <a href="mailto:jazziliu101@gmail.com" className="inline-flex items-center gap-2 px-4 py-2 bg-card border rounded-lg hover:border-primary hover:text-primary transition-colors text-sm font-medium">
+            <Mail className="w-4 h-4" /> jazziliu101@gmail.com
           </a>
-          <a href="https://github.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-card border rounded-lg hover:border-primary hover:text-primary transition-colors text-sm font-medium">
-            <Github className="w-4 h-4" /> GitHub
-          </a>
-          <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-card border rounded-lg hover:border-primary hover:text-primary transition-colors text-sm font-medium">
+          <a href="https://www.linkedin.com/in/zi-liu-4877a882/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-card border rounded-lg hover:border-primary hover:text-primary transition-colors text-sm font-medium">
             <Linkedin className="w-4 h-4" /> LinkedIn
-          </a>
-          <a href="https://twitter.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-card border rounded-lg hover:border-primary hover:text-primary transition-colors text-sm font-medium">
-            <Twitter className="w-4 h-4" /> Twitter
           </a>
         </div>
       </section>
