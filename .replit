@@ -24,3 +24,8 @@ channel = "stable-25_05"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-caeb8053-e06f-4fae-9143-91829ebbd50e"
+
+[userenv]
+
+[userenv.shared]
+PRODUCTION_ORIGIN = "https://knowledge-hub--jazziliu101.replit.app"
