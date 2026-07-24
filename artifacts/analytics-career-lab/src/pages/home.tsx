@@ -30,13 +30,19 @@ export default function Home() {
   return (
     <div className="space-y-10">
       {/* Intro */}
-      <section className="space-y-3">
-        <h1 className="text-4xl font-bold tracking-tight">Zi's Analytics Engineering Lab
-</h1>
-        <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">A working knowledge base and public portfolio — where I document what I build, what I know, and what I'm learning.</p>
-        <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-          About me <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+      <section className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+        <div className="space-y-3">
+          <h1 className="text-4xl font-bold tracking-tight">Zi's Analytics Engineering Lab</h1>
+          <p className="text-xl text-muted-foreground max-w-xl leading-relaxed">A working knowledge base and public portfolio — where I document what I build, what I know, and what I'm learning.</p>
+          <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+            About me <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+        <img
+          src={`${import.meta.env.BASE_URL}img-home.jpg`}
+          alt=""
+          className="hidden sm:block w-48 h-36 object-cover rounded-2xl shadow-md shrink-0 opacity-90"
+        />
       </section>
       {/* Search */}
       <section className="relative z-10 max-w-2xl">

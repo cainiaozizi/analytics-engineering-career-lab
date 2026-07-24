@@ -16,13 +16,20 @@ export default function Blog() {
     <div className="space-y-10 max-w-3xl">
       <header className="space-y-4">
         <div className="flex items-start justify-between gap-4">
-          <div className="space-y-4">
+          <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">Guides</h1>
-            <p className="text-lg text-muted-foreground">What I know </p>
+            <p className="text-lg text-muted-foreground">What I know.</p>
           </div>
-          <Button size="sm" onClick={() => setCreateOpen(true)} className="shrink-0 mt-1">
-            <PenLine className="w-3.5 h-3.5 mr-1.5" /> New post
-          </Button>
+          <div className="flex items-start gap-3 shrink-0">
+            <img
+              src={`${import.meta.env.BASE_URL}img-guides.jpg`}
+              alt=""
+              className="hidden md:block w-36 h-24 object-cover rounded-xl shadow-sm opacity-90"
+            />
+            <Button size="sm" onClick={() => setCreateOpen(true)} className="shrink-0 mt-1">
+              <PenLine className="w-3.5 h-3.5 mr-1.5" /> New post
+            </Button>
+          </div>
         </div>
       </header>
 

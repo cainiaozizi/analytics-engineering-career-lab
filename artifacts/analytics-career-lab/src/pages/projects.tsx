@@ -24,15 +24,22 @@ export default function Projects() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <p className="text-lg text-muted-foreground">What I built </p>
+          <p className="text-lg text-muted-foreground">What I built.</p>
         </div>
-        <Button
-          variant="outline"
-          className="shrink-0"
-          onClick={() => setUploadOpen(true)}
-        >
-          <Upload className="w-4 h-4 mr-2" /> Upload
-        </Button>
+        <div className="flex items-start gap-3 shrink-0">
+          <img
+            src={`${import.meta.env.BASE_URL}img-projects.jpg`}
+            alt=""
+            className="hidden md:block w-36 h-24 object-cover rounded-xl shadow-sm opacity-90"
+          />
+          <Button
+            variant="outline"
+            className="shrink-0"
+            onClick={() => setUploadOpen(true)}
+          >
+            <Upload className="w-4 h-4 mr-2" /> Upload
+          </Button>
+        </div>
       </div>
 
       <UploadProject open={uploadOpen} onOpenChange={setUploadOpen} />
