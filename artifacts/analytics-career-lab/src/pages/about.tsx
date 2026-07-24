@@ -5,9 +5,7 @@ export default function About() {
     <div className="max-w-3xl space-y-12">
       <header className="space-y-4">
         <h1 className="text-4xl font-bold tracking-tight">About Me</h1>
-        <p className="text-xl text-muted-foreground leading-relaxed">
-          I build data products, infrastructure, and the tools that connect them.
-        </p>
+        <p className="text-xl text-muted-foreground leading-relaxed">Passionate about turning messy business problems into reliable data products and decisions.</p>
       </header>
       <div className="prose prose-slate dark:prose-invert prose-lg max-w-none text-muted-foreground leading-relaxed">
         <p>
