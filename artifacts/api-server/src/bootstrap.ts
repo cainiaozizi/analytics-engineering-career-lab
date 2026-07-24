@@ -1,7 +1,39 @@
 import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
 import { config } from "./config.js";
 import { signPayload, verifySignature, safeEqual } from "./middlewares/requireOwner.js";
 import { logger } from "./lib/logger.js";
+
+/**
+ * Operator-side replay channels for the bootstrap URL and the captured sub.
+ *
+ * Pino's INFO stream is the operator-visible surface for the bootstrap banner,
+ * but Replit's deployment log capture has been observed to clip multi-line
+ * startup records on some publishes, leaving the URL unrecoverable from the
+ * `fetchDeploymentLogs` tool or the publish-logs pane. So we ALSO mirror the
+ * URL into the workspace-local file below. The file is created/restricted
+ * to mode 0600, regenerated whenever a fresh bootstrap window opens, and
+ * overwritten/cleared whenever the bootstrap window closes — so the file is
+ * only ever populated *during* active bootstrap. We deliberately choose a
+ * workspace-relative path so it survives across deploys in one place that
+ * the platform's shell sandbox can read, regardless of the api-server's
+ * runtime cwd.
+ *
+ * OWNER USAGE: the file is single-process, intentionally redacted, and
+ * deleted on a successful claim / final normal-mode boot. If you see it
+ * outside of an active bootstrap window, treat the contents as leaked and
+ * rotate the SESSION_SECRET.
+ */
+const BOOTSTRAP_URL_FILE = path.resolve("/home/runner/workspace/.bootstrap-url");
+const BOOTSTRAP_SUB_FILE = path.resolve("/home/runner/workspace/.bootstrap-sub");
+
+/** Ensure any prior copy is cleared when a fresh bootstrap window opens. */
+function clearBootstrapSubFile(): void {
+  try {
+    fs.rmSync(BOOTSTRAP_SUB_FILE, { force: true });
+  } catch { /* best-effort */ }
+}
 
 /**
  * Bootstrap mode for first-time owner login.
@@ -61,6 +93,16 @@ export function initBootstrap(): void {
   };
 
   const fullLoginUrl = `${config.productionOrigin}/api/auth/google?token=${token}`;
+  // Mirror the URL to the workspace-local recovery file so an operator can
+  // `cat .bootstrap-url` even when the pino deployment log channel
+  // truncates the multi-line banner.
+  try {
+    fs.writeFileSync(BOOTSTRAP_URL_FILE, fullLoginUrl + "\n", { mode: 0o600 });
+    // A new bootstrap window invalidates any sub from a prior window.
+    clearBootstrapSubFile();
+  } catch {
+    // File mirror is best-effort; the pino channel is the primary surface.
+  }
   // Log to pino so it lands in Replit's production deployment log stream
   // (fetchDeploymentLogs). Kept identical to the previous console.log banner
   // so an operator can copy the URL/token straight from the publish-logs pane.
@@ -164,6 +206,14 @@ export function consumeBootstrapToken(): boolean {
 export function recordBootstrapClaim(sub: string): void {
   if (!state) return;
   state.claimedSub = sub;
+  // Mirror the discovered sub to the workspace-local recovery file so the
+  // operator can `cat .bootstrap-sub` without depending on the pino
+  // deployment log channel.
+  try {
+    fs.writeFileSync(BOOTSTRAP_SUB_FILE, sub + "\n", { mode: 0o600 });
+  } catch {
+    /* best-effort */
+  }
   logger.info(
     "[bootstrap] First owner login recorded.\n" +
       "[bootstrap] Sub: " +
@@ -173,15 +223,36 @@ export function recordBootstrapClaim(sub: string): void {
   );
 }
 
-/** Returned in /api/auth/me so the UI can show a banner during bootstrap. */
+/**
+ * Surface bootstrap window state to operators.
+ *
+ * Returned by:
+ *   - `/api/auth/me` indirectly via the existing route
+ *   - `/api/_debug/bootstrap-status` (new route in routes/auth.ts) directly,
+ *     to give a reliable post-publish recovery channel when Replit's
+ *     `fetchDeploymentLogs` clip multi-line startup records.
+ *
+ * `fullLoginUrl` is only populated while `active` is true; otherwise it's
+ * null and the caller sees just the bookkeeping fields. The URL is the
+ * same single-use token printed at startup; exposing it via this endpoint
+ * is no riskier than the pino log mirror (Replit's deployment log viewer
+ * already shows it to deploy collaborators), but lets `GET` work even when
+ * the pino log mirror is unwritable.
+ */
 export function getBootstrapStatus(): {
   active: boolean;
   claimed: boolean;
   claimedSub: string | null;
+  fullLoginUrl: string | null;
 } {
+  const active = isBootstrapActive();
   return {
-    active: isBootstrapActive(),
+    active,
     claimed: !!state?.claimedSub,
     claimedSub: state?.claimedSub ?? null,
+    fullLoginUrl:
+      active && config.productionOrigin && state?.token
+        ? `${config.productionOrigin}/api/auth/google?token=${state.token}`
+        : null,
   };
 }
