@@ -227,29 +227,35 @@ export function recordBootstrapClaim(sub: string): void {
  * Surface bootstrap window state to operators.
  *
  * Returned by:
- *   - `/api/auth/me` indirectly via the existing route
- *   - `/api/_debug/bootstrap-status` (new route in routes/auth.ts) directly,
- *     to give a reliable post-publish recovery channel when Replit's
- *     `fetchDeploymentLogs` clip multi-line startup records.
+ *   - `/api/_debug/bootstrap-status` route mounted at top-level
+ *     (see routes/index.ts) for a reliable post-publish recovery channel
+ *     when Replit's `fetchDeploymentLogs` clips multi-line startup records.
  *
- * `fullLoginUrl` is only populated while `active` is true; otherwise it's
- * null and the caller sees just the bookkeeping fields. The URL is the
- * same single-use token printed at startup; exposing it via this endpoint
- * is no riskier than the pino log mirror (Replit's deployment log viewer
- * already shows it to deploy collaborators), but lets `GET` work even when
- * the pino log mirror is unwritable.
+ * `fullLoginUrl` is only populated while `active` is true; otherwise the
+ * returned object reports just the bookkeeping fields. We deliberately
+ * omit `claimedSub` from the wire payload — the sub is logged via pino
+ * (`[bootstrap] Sub: <id>`) and mirrored to the workspace file
+ * `.bootstrap-sub` at the moment of claim, both of which are operator-only
+ * channels. This endpoint is reachable on a *public* deployment during the
+ * bootstrap window, so we cannot leak the discovered Google sub even after
+ * a successful claim: the next time it could be visible is BEFORE the
+ * claim is recorded (when it is null) or AFTER `OWNER_GOOGLE_SUB` is set
+ * in env (state is nulled out, no sub to leak).
+ *
+ * In addition, `routes/index.ts` only registers this endpoint while
+ * bootstrap is genuinely active; once `OWNER_GOOGLE_SUB` is set or the
+ * token has been consumed, the route returns 404 so the entire surface
+ * disappears in steady-state.
  */
 export function getBootstrapStatus(): {
   active: boolean;
   claimed: boolean;
-  claimedSub: string | null;
   fullLoginUrl: string | null;
 } {
   const active = isBootstrapActive();
   return {
     active,
     claimed: !!state?.claimedSub,
-    claimedSub: state?.claimedSub ?? null,
     fullLoginUrl:
       active && config.productionOrigin && state?.token
         ? `${config.productionOrigin}/api/auth/google?token=${state.token}`
