@@ -14,6 +14,7 @@ import {
   recordBootstrapClaim,
   verifyBootstrapState,
 } from "../bootstrap.js";
+import { logger } from "../lib/logger.js";
 
 const BOOTSTRAP_STATE_COOKIE = "bootstrap_state";
 
