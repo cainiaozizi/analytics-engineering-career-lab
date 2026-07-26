@@ -10,31 +10,35 @@ declare global {
   }
 }
 
+function initializeGA() {
+  if (window.gtag) return;
+
+  window.dataLayer = window.dataLayer || [];
+
+  window.gtag = (...args: unknown[]) => {
+    window.dataLayer.push(args);
+  };
+
+  window.gtag('js', new Date());
+
+  window.gtag('config', GA_MEASUREMENT_ID, {
+    send_page_view: false,
+  });
+
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+  document.head.appendChild(script);
+}
+
 export function Analytics() {
   const [location] = useLocation();
 
   useEffect(() => {
-    if (!import.meta.env.PROD || !GA_MEASUREMENT_ID) return;
+    if (!import.meta.env.PROD) return;
 
-    // Load GA4 once
-    if (!window.gtag) {
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-      document.head.appendChild(script);
+    initializeGA();
 
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = (...args: unknown[]) => {
-        window.dataLayer.push(args);
-      };
-
-      window.gtag('js', new Date());
-      window.gtag('config', GA_MEASUREMENT_ID, {
-        send_page_view: false,
-      });
-    }
-
-    // Track Wouter route changes
     window.gtag?.('event', 'page_view', {
       page_path: window.location.pathname + window.location.search,
       page_location: window.location.href,
