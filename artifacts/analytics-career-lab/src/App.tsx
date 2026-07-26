@@ -4,6 +4,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
 import { Layout } from '@/components/layout';
 import { AuthProvider } from '@/context/auth';
+import { Analytics } from '@/analytics';
 
 import Home from '@/pages/home';
 import Projects from '@/pages/projects';
@@ -41,6 +42,7 @@ function App() {
       <AuthProvider>
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+            <Analytics />
             <Router />
           </WouterRouter>
           <Toaster />
