@@ -69,7 +69,7 @@ export const TAXONOMY: TagCategory[] = [
     ],
   },
   {
-    label: "Interview Prep",
+    label: "Career",
     emoji: "🎯",
     tags: [
       "SQL",

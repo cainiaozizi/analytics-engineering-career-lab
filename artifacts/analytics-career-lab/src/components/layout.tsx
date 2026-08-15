@@ -10,7 +10,7 @@ const navItems = [
   { name: "Home", path: "/", icon: LayoutDashboard },
   { name: "Projects", path: "/projects", icon: PenTool },
   { name: "Writings", path: "/writings", icon: FileText },
-  { name: "Interview Prep", path: "/interview-prep", icon: MessageSquare },
+  { name: "Career", path: "/career", icon: MessageSquare },
   { name: "About", path: "/about", icon: User },
 ];
 

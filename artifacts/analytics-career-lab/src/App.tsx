@@ -11,8 +11,8 @@ import Projects from '@/pages/projects';
 import ProjectDetail from '@/pages/project-detail';
 import Writings from '@/pages/writings';
 import WritingDetail from '@/pages/writing-detail';
-import InterviewPrep from '@/pages/interview-prep';
-import InterviewPrepDetail from '@/pages/interview-prep-detail';
+import Career from '@/pages/career';
+import CareerDetail from '@/pages/career-detail';
 import About from '@/pages/about';
 import NotFound from '@/pages/not-found';
 
@@ -27,8 +27,8 @@ function Router() {
         <Route path="/projects/:id" component={ProjectDetail} />
         <Route path="/writings" component={Writings} />
         <Route path="/writings/:id" component={WritingDetail} />
-        <Route path="/interview-prep" component={InterviewPrep} />
-        <Route path="/interview-prep/:id" component={InterviewPrepDetail} />
+        <Route path="/career" component={Career} />
+        <Route path="/career/:id" component={CareerDetail} />
         <Route path="/about" component={About} />
         <Route component={NotFound} />
       </Switch>

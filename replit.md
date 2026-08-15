@@ -36,7 +36,7 @@ A personal knowledge hub and public portfolio for an Analytics Engineer. Serves 
 - **Visibility model**: Every content type (projects, posts, notes) has a `visibility` field (`public` | `private` | `draft`). No auth system is implemented yet — the field is data-only. Filtering by visibility happens at the API query layer.
 - **Homepage aggregation endpoint**: `/api/homepage` returns featured projects, featured knowledge (posts), and recent notes in one call to minimize waterfall on the home page.
 - **Search**: `/api/search?q=` does ILIKE across all four content types and returns a unified `SearchResult[]` with a `type` discriminator field.
-- **Interview prep**: Organized by topic. `/api/interview/topics` returns topic + count aggregates used by the sidebar; `/api/interview?topic=X` filters entries.
+- **Career**: Organized by topic. `/api/interview/topics` returns topic + count aggregates used by the sidebar; `/api/interview?topic=X` filters entries.
 
 ## Product
 
@@ -44,7 +44,7 @@ A personal knowledge hub and public portfolio for an Analytics Engineer. Serves 
 - **Projects** — portfolio of engineering projects with tech stack, links, visibility badges
 - **Blog/Writing** — technical articles and long-form writing
 - **Engineering Notes** — short-form notes organized by tag
-- **Interview Prep** — Q&A organized by topic (SQL, dbt, BigQuery, Data Modeling, Analytics, Data Engineering)
+- **Career** — Q&A organized by topic (SQL, dbt, BigQuery, Data Modeling, Analytics, Data Engineering)
 - **About** — personal bio and contact
 
 ## User preferences

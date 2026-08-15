@@ -38,7 +38,7 @@ export default function NoteDetail() {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListNotesQueryKey() });
-        navigate("/interview-prep");
+        navigate("/career");
       },
     },
   });
@@ -56,8 +56,8 @@ export default function NoteDetail() {
   if (!note) {
     return (
       <div className="max-w-2xl space-y-4">
-        <Link href="/interview-prep" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Interview Prep
+        <Link href="/career" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Career
         </Link>
         <div className="border border-dashed rounded-xl p-12 text-center space-y-2">
           <p className="text-lg font-medium">Note not found</p>
@@ -70,8 +70,8 @@ export default function NoteDetail() {
   return (
     <article className="max-w-2xl space-y-8">
       <div className="flex items-center justify-between">
-        <Link href="/interview-prep" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Interview Prep
+        <Link href="/career" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Career
         </Link>
         {isOwner && (
           <div className="flex items-center gap-2">

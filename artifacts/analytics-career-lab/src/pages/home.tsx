@@ -12,7 +12,7 @@ import { formatDate } from "@/lib/utils";
 const TYPE_LABELS: Record<string, string> = {
   project: "project",
   post: "writing",
-  note: "interview prep",
+  note: "career",
 };
 
 export default function Home() {
@@ -43,7 +43,7 @@ export default function Home() {
           <Input 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search projects, writings, interview prep..." 
+            placeholder="Search projects, writings, career..." 
             className="pl-10 h-12 text-base rounded-xl bg-card border-2 border-border shadow-sm focus-visible:ring-primary"
           />
         </div>
@@ -63,11 +63,11 @@ export default function Home() {
                   const itemHref =
                     result.type === 'project' ? `/projects/${result.id}` :
                     result.type === 'post' ? `/writings/${result.id}` :
-                    `/interview-prep/${result.id}`;
+                    `/career/${result.id}`;
                   const sectionHref =
                     result.type === 'project' ? '/projects' :
                     result.type === 'post' ? '/writings' :
-                    '/interview-prep';
+                    '/career';
                   return (
                     <div
                       key={`${result.type}-${result.id}`}
@@ -162,18 +162,18 @@ export default function Home() {
               </section>
             )}
 
-            {/* Interview Prep */}
+            {/* Career */}
             {home.recentNotes.length > 0 && (
               <section className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold tracking-tight">Interview Prep</h2>
-                  <Link href="/interview-prep" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
+                  <h2 className="text-2xl font-semibold tracking-tight">Career</h2>
+                  <Link href="/career" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
                     All entries <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
                 <div className="space-y-3">
                   {home.recentNotes.map(note => (
-                    <Link key={note.id} href={`/interview-prep/${note.id}`} className="group block">
+                    <Link key={note.id} href={`/career/${note.id}`} className="group block">
                       <div className="p-4 rounded-xl border border-transparent hover:border-border hover:bg-card transition-all">
                         <div className="flex items-baseline justify-between mb-1">
                           <h3 className="font-semibold group-hover:text-primary transition-colors">{note.title}</h3>

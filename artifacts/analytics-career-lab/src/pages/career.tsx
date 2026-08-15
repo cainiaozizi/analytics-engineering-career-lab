@@ -9,7 +9,7 @@ import { formatDate } from "@/lib/utils";
 import { Hash, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function InterviewPrep() {
+export default function Career() {
   const { data: notes, isLoading } = useListNotes();
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -44,7 +44,7 @@ export default function InterviewPrep() {
     <div className="space-y-8 max-w-3xl">
       <header className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">Interview Prep</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Career</h1>
           <p className="text-lg text-muted-foreground">Resources I have curated to help myself and others.</p>
         </div>
         {isOwner && (
@@ -110,7 +110,7 @@ export default function InterviewPrep() {
           {filteredNotes.map((note) => (
             <Link
               key={note.id}
-              href={`/interview-prep/${note.id}`}
+              href={`/career/${note.id}`}
               className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 p-4 border-b last:border-0 hover:bg-muted/50 transition-colors group"
             >
               <div className="flex-shrink-0 flex flex-row sm:flex-col justify-between sm:justify-start sm:w-28 gap-1">
